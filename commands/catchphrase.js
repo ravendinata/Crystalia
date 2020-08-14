@@ -17,6 +17,13 @@ module.exports = {
                 return message.reply('Catchphrase AKB48');
             }
         }
+        else if (args[0] === 'HKT48')
+        {
+            if (args[1] === 'UnjoHirona')
+            {
+                return message.reply('なっぴをよぶときはー？(るーるるるる)ってよんでください！きつねと一緒に会いにいくべさ！弘菜がみんなのめんこちゃんになるど！なっぴこと運上弘菜です!');
+            }
+        }
 
         message.channel.send(`First argument: ${args[0]}`);
         message.channel.send(`Second argument: ${args[1]}`);
