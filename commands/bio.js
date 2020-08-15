@@ -47,6 +47,44 @@ module.exports = {
 
                 return message.channel.send(bio);
             }
+            else if (args[1] === 'KuboSatone')
+            {
+                const bio = new Discord.MessageEmbed()
+                    .setColor(color)
+                    .setTitle(`Kubo Satone's (久保怜音) Biography`)
+                    .setAuthor('AKB48 Fandom', fandomIconURL, fandomURL)
+                    .addFields(
+                        { name: 'Nickname:', value: 'Satopii (さとぴー)'},
+                        { name: 'Birthdate:', value: 'November 20, 2003'},
+                        { name: 'Birthplace:', value: 'Kanagawa, Japan'},
+                        { name: 'Blood Type:', value: 'O'},
+                        { name: 'Height:', value: '157cm'},
+                        { name: 'Group:', value: 'AKB48'},
+                        { name: 'Team:', value: 'Team B'}
+                    )
+                    .setImage('https://vignette.wikia.nocookie.net/akb48/images/5/5b/Kubo_Satone_AKB48_2020.jpg')
+
+                return message.channel.send(bio);
+            }
+            else if (args[1] === 'MurayamaYuiri')
+            {
+                const bio = new Discord.MessageEmbed()
+                    .setColor(color)
+                    .setTitle(`Murayama Yuiri's (村山彩希) Biography`)
+                    .setAuthor('AKB48 Fandom', fandomIconURL, fandomURL)
+                    .addFields(
+                        { name: 'Nickname:', value: 'Yuiri (ゆいり)\nYuiringo~ (ゆいりんご〜)'},
+                        { name: 'Birthdate:', value: 'June 15, 1997'},
+                        { name: 'Birthplace:', value: 'Kanagawa, Japan'},
+                        { name: 'Blood Type:', value: 'O'},
+                        { name: 'Height:', value: '155.7cm'},
+                        { name: 'Group:', value: 'AKB48'},
+                        { name: 'Team:', value: 'Team 4'}
+                    )
+                    .setImage('https://vignette.wikia.nocookie.net/akb48/images/1/1a/Murayama_Yuiri_AKB48_2020.jpg')
+
+                return message.channel.send(bio);
+            }
             else if (args[1] === 'Test')
             {
                 return message.reply('Bio AKB48');
