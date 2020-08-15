@@ -7,8 +7,14 @@ module.exports = {
             if (args[1] === 'OguriYui')
             {
                 const bio = new Discord.MessageEmbed()
+                    .setColor('#0099ff')
                     .setTitle('Oguri Yui')
-                    .setImage('https://vignette.wikia.nocookie.net/akb48/images/1/10/Oguri_Yui_AKB48_2020.jpg/');
+                    .setAuthor('AKB48 Fandom', 'https://vignette4.wikia.nocookie.net/akb48/images/8/89/Wiki-wordmark.png/revision/latest?cb=20170617121411', 'https://akb48.fandom.com/')
+                    .setDescription('Some description here')
+                    .setThumbnail('https://vignette.wikia.nocookie.net/akb48/images/1/10/Oguri_Yui_AKB48_2020.jpg/revision/latest/scale-to-width-down/240?cb=20200814004429')
+                    .addField('Inline field title', 'Some value here', true)
+                    .setImage('https://vignette.wikia.nocookie.net/akb48/images/1/10/Oguri_Yui_AKB48_2020.jpg/revision/latest/scale-to-width-down/240?cb=20200814004429')
+                    .setTimestamp();
 
                 channel.send(bio);
             }
