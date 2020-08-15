@@ -6,11 +6,11 @@ module.exports = {
 	name: 'bio',
     description: 'Displays bio of selected member',
     execute(message, args) {
-        if (args[0] === 'AKB48')
+        if (args[0] === 'akb48')
         {
             const color = '#ffa3ed';
 
-            if (args[1] === 'OguriYui')
+            if (args[1] === 'oguriyui')
             {
                 const bio = new Discord.MessageEmbed()
                     .setColor(color)
@@ -28,7 +28,7 @@ module.exports = {
 
                 return message.channel.send(bio);
             }
-            else if (args[1] === 'YamauchiMizuki')
+            else if (args[1] === 'yamauchimizuki')
             {
                 const bio = new Discord.MessageEmbed()
                     .setColor(color)
@@ -47,7 +47,7 @@ module.exports = {
 
                 return message.channel.send(bio);
             }
-            else if (args[1] === 'KuboSatone')
+            else if (args[1] === 'kubosatone')
             {
                 const bio = new Discord.MessageEmbed()
                     .setColor(color)
@@ -66,7 +66,7 @@ module.exports = {
 
                 return message.channel.send(bio);
             }
-            else if (args[1] === 'MurayamaYuiri')
+            else if (args[1] === 'murayamayuiri')
             {
                 const bio = new Discord.MessageEmbed()
                     .setColor(color)
@@ -85,16 +85,16 @@ module.exports = {
 
                 return message.channel.send(bio);
             }
-            else if (args[1] === 'Test')
+            else if (args[1] === 'test')
             {
                 return message.reply('Bio AKB48');
             }
         }
-        else if (args[0] === 'HKT48')
+        else if (args[0] === 'hkt48')
         {
             const color = '#000000';
 
-            if (args[1] === 'UnjoHirona')
+            if (args[1] === 'unjohirona')
             {
                 const bio = new Discord.MessageEmbed()
                     .setColor(color)
