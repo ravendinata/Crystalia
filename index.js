@@ -21,16 +21,15 @@ client.on('message', message => {
 
 	const args = message.content.split(/ -/);
 	const command = args.shift().toLowerCase();
-    console.info('Command detected!');
-    console.info(`Called command: ${command} with argument ${args}`);
 
 	if (!client.commands.has(command)) return;
 
 	try {
 		client.commands.get(command).execute(message, args);
+	    console.info(`Called command: ${command} with argument ${args}`);
 	} catch (error) {
 		console.error(error);
-		message.reply('there was an error trying to execute that command!');
+		message.reply('There was an error trying to execute that command!');
 	}
 });
 

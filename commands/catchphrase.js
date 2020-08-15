@@ -25,7 +25,8 @@ module.exports = {
             }
         }
 
-        message.channel.send(`First argument: ${args[0]}`);
-        message.channel.send(`Second argument: ${args[1]}`);
+        message.channel.send('Cannot Find Member from the Specified Group!');
+        message.channel.send(`Group: ${args[0]}`);
+        message.channel.send(`Member Name: ${args[1]}`);
     },
 };
