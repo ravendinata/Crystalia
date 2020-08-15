@@ -1,4 +1,6 @@
 const Discord = require('discord.js');
+const fandomURL = 'https://akb48.fandom.com/';
+const fandomIconURL = 'https://vignette4.wikia.nocookie.net/akb48/images/8/89/Wiki-wordmark.png';
 
 module.exports = {
 	name: 'bio',
@@ -13,7 +15,7 @@ module.exports = {
                 const bio = new Discord.MessageEmbed()
                     .setColor(color)
                     .setTitle(`Oguri Yui's (小栗有以) Biography`)
-                    .setAuthor('AKB48 Fandom', 'https://vignette4.wikia.nocookie.net/akb48/images/8/89/Wiki-wordmark.png/revision/latest?cb=20170617121411', 'https://akb48.fandom.com/')
+                    .setAuthor('AKB48 Fandom', fandomIconURL, fandomURL)
                     .addFields(
                         { name: 'Nickname:', value: 'Yuiyui (ゆいゆい)'},
                         { name: 'Birthdate:', value: 'December 26, 2001'},
@@ -31,7 +33,7 @@ module.exports = {
                 const bio = new Discord.MessageEmbed()
                     .setColor(color)
                     .setTitle(`Yamauchi Mizuki's (山内瑞葵) Biography`)
-                    .setAuthor('AKB48 Fandom', 'https://vignette4.wikia.nocookie.net/akb48/images/8/89/Wiki-wordmark.png/revision/latest?cb=20170617121411', 'https://akb48.fandom.com/')
+                    .setAuthor('AKB48 Fandom', fandomIconURL, fandomURL)
                     .addFields(
                         { name: 'Nickname:', value: 'Zukkii (ずっきー)'},
                         { name: 'Birthdate:', value: 'September 20, 2001'},
@@ -47,7 +49,7 @@ module.exports = {
             }
             else if (args[1] === 'Test')
             {
-                return message.reply('Catchphrase AKB48');
+                return message.reply('Bio AKB48');
             }
         }
         else if (args[0] === 'HKT48')
@@ -59,7 +61,7 @@ module.exports = {
                 const bio = new Discord.MessageEmbed()
                     .setColor(color)
                     .setTitle(`Unjo Hirona's (運上弘菜) Biography`)
-                    .setAuthor('AKB48 Fandom', 'https://vignette4.wikia.nocookie.net/akb48/images/8/89/Wiki-wordmark.png/revision/latest?cb=20170617121411', 'https://akb48.fandom.com/')
+                    .setAuthor('AKB48 Fandom', fandomIconURL, fandomURL)
                     .addFields(
                         { name: 'Nickname:', value: 'Nappi (なっぴ)'},
                         { name: 'Birthdate:', value: 'August 9, 1998'},
@@ -75,7 +77,8 @@ module.exports = {
             }
         }
 
-        message.channel.send(`First argument: ${args[0]}`);
-        message.channel.send(`Second argument: ${args[1]}`);
+        message.channel.send('Cannot Find Member from the Specified Group!');
+        message.channel.send(`Group: ${args[0]}`);
+        message.channel.send(`Member Name: ${args[1]}`);
     },
 };
