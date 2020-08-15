@@ -10,6 +10,7 @@ module.exports = {
                     .setTitle('Oguri Yui')
                     .setImage('https://vignette.wikia.nocookie.net/akb48/images/1/10/Oguri_Yui_AKB48_2020.jpg/');
 
+                channel.send(bio);
             }
             else if (args[1] === 'YamauchiMizuki')
             {
