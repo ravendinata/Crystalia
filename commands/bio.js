@@ -1,4 +1,17 @@
 const Discord = require('discord.js');
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+    host: 'us-cdbr-east-02.cleardb.com',
+    user: 'bf0b2d2a04cd04',
+    password: 'c82ad2e3',
+    database: 'heroku_774353f79cb52ed'
+});
+
+con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected to Database!");
+})
 
 module.exports = {
 	name: 'bio',
@@ -8,77 +21,35 @@ module.exports = {
         {
             const color = '#ff69b3';
 
-            if (args[1] === 'oguriyui')
+            con.query(`SELECT * FROM ` + args[0]+ ` WHERE short='` + args[1] + `'`, function (err, rows)
             {
-                const bio = new Discord.MessageEmbed()
-                    .setColor(color)
-                    .setTitle(`Oguri Yui's (小栗有以) Biography`)
-                    .addFields(
-                        { name: 'Nickname:', value: 'Yuiyui (ゆいゆい)'},
-                        { name: 'Birthdate:', value: 'December 26, 2001'},
-                        { name: 'Birthplace:', value: 'Tokyo, Japan'},
-                        { name: 'Height:', value: '163cm'},
-                        { name: 'Group:', value: 'AKB48'},
-                        { name: 'Team:', value: 'Team 8/Team A'}
-                    )
-                    .setImage('https://vignette.wikia.nocookie.net/akb48/images/1/10/Oguri_Yui_AKB48_2020.jpg')
+                if (err) throw err;
 
-                return message.channel.send(bio);
-            }
-            else if (args[1] === 'yamauchimizuki')
-            {
-                const bio = new Discord.MessageEmbed()
-                    .setColor(color)
-                    .setTitle(`Yamauchi Mizuki's (山内瑞葵) Biography`)
-                    .addFields(
-                        { name: 'Nickname:', value: 'Zukkii (ずっきー)'},
-                        { name: 'Birthdate:', value: 'September 20, 2001'},
-                        { name: 'Birthplace:', value: 'Tokyo, Japan'},
-                        { name: 'Blood Type:', value: 'O'},
-                        { name: 'Height:', value: '160cm'},
-                        { name: 'Group:', value: 'AKB48'},
-                        { name: 'Team:', value: 'Team 4'}
-                    )
-                    .setImage('https://vignette.wikia.nocookie.net/akb48/images/3/3f/Yamauchi_Mizuki_AKB48_2020.jpg')
+                if (rows[0] == undefined)
+                {
+                    message.channel.send(`Argument Error: Cannot Find Member from the Specified Group!\nGroup: ${args[0]}\nMember Name: ${args[1]}`);
+                    return;
+                }
 
-                return message.channel.send(bio);
-            }
-            else if (args[1] === 'kubosatone')
-            {
-                const bio = new Discord.MessageEmbed()
-                    .setColor(color)
-                    .setTitle(`Kubo Satone's (久保怜音) Biography`)
-                    .addFields(
-                        { name: 'Nickname:', value: 'Satopii (さとぴー)'},
-                        { name: 'Birthdate:', value: 'November 20, 2003'},
-                        { name: 'Birthplace:', value: 'Kanagawa, Japan'},
-                        { name: 'Blood Type:', value: 'O'},
-                        { name: 'Height:', value: '157cm'},
-                        { name: 'Group:', value: 'AKB48'},
-                        { name: 'Team:', value: 'Team B'}
-                    )
-                    .setImage('https://vignette.wikia.nocookie.net/akb48/images/5/5b/Kubo_Satone_AKB48_2020.jpg')
+                const result = JSON.stringify(rows[0]);
+                const data = JSON.parse(result);
 
-                return message.channel.send(bio);
-            }
-            else if (args[1] === 'murayamayuiri')
-            {
                 const bio = new Discord.MessageEmbed()
-                    .setColor(color)
-                    .setTitle(`Murayama Yuiri's (村山彩希) Biography`)
-                    .addFields(
-                        { name: 'Nickname:', value: 'Yuiri (ゆいり)\nYuiringo~ (ゆいりんご〜)'},
-                        { name: 'Birthdate:', value: 'June 15, 1997'},
-                        { name: 'Birthplace:', value: 'Kanagawa, Japan'},
-                        { name: 'Blood Type:', value: 'O'},
-                        { name: 'Height:', value: '155.7cm'},
-                        { name: 'Group:', value: 'AKB48'},
-                        { name: 'Team:', value: 'Team 4'}
-                    )
-                    .setImage('https://vignette.wikia.nocookie.net/akb48/images/1/1a/Murayama_Yuiri_AKB48_2020.jpg')
+                        .setColor(color)
+                        .setTitle(`${data.name}'s (${data.name_kanji}) Biography`)
+                        .addFields(
+                            { name: 'Nickname:', value: data.nickname},
+                            { name: 'Birthdate:', value: data.birthdate},
+                            { name: 'Birthplace:', value: data.birthplace},
+                            { name: 'Height:', value: data.height},
+                            { name: 'Bloodtype:', value: data.bloodtype},
+                            { name: 'Group:', value: data.group},
+                            { name: 'Team:', value: data.team}
+                        )
+                        .setImage(data.img_url)
 
-                return message.channel.send(bio);
-            }
+                    return message.channel.send(bio);
+            })
         }
         else if (args[0] === 'hkt48')
         {
@@ -196,8 +167,8 @@ module.exports = {
             }
         }
 
-        message.channel.send('Argument Error: Cannot Find Member from the Specified Group!');
+        /* message.channel.send('Argument Error: Cannot Find Member from the Specified Group!');
         message.channel.send(`Group: ${args[0]}`);
-        message.channel.send(`Member Name: ${args[1]}`);
+        message.channel.send(`Member Name: ${args[1]}`); */
     },
 };
