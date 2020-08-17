@@ -1,57 +1,62 @@
 const Discord = require('discord.js');
 var mysql = require('mysql');
 
-var con = mysql.createConnection({
+var pool = mysql.createPool({
     host: 'us-cdbr-east-02.cleardb.com',
     user: 'bf0b2d2a04cd04',
     password: 'c82ad2e3',
     database: 'heroku_774353f79cb52ed'
 });
 
-con.connect(function(err) {
+/* con.connect(function(err) {
     if (err) throw err;
     console.log("Connected to Database!");
-})
+})  */
 
 module.exports = {
 	name: 'bio',
     description: 'Displays bio of selected member',
     execute(message, args) {
-        if (args[0] === 'akb48')
+        pool.getConnection((err, con) => 
         {
-            const color = '#ff69b3';
-
-            con.query(`SELECT * FROM ` + args[0]+ ` WHERE short='` + args[1] + `'`, function (err, rows)
+            if (args[0] === 'akb48')
             {
-                if (err) throw err;
+                const color = '#ff69b3';
 
-                if (rows[0] == undefined)
+                con.query(`SELECT * FROM ` + args[0]+ ` WHERE short='` + args[1] + `'`, function (err, rows)
                 {
-                    message.channel.send(`Argument Error: Cannot Find Member from the Specified Group!\nGroup: ${args[0]}\nMember Name: ${args[1]}`);
-                    return;
-                }
+                    if (err) throw err;
 
-                const result = JSON.stringify(rows[0]);
-                const data = JSON.parse(result);
+                    if (rows[0] == undefined)
+                    {
+                        message.channel.send(`Argument Error: Cannot Find Member from the Specified Group!\nGroup: ${args[0]}\nMember Name: ${args[1]}`);
+                        return;
+                    }
 
-                const bio = new Discord.MessageEmbed()
-                        .setColor(color)
-                        .setTitle(`${data.name}'s (${data.name_kanji}) Biography`)
-                        .addFields(
-                            { name: 'Nickname:', value: data.nickname},
-                            { name: 'Birthdate:', value: data.birthdate},
-                            { name: 'Birthplace:', value: data.birthplace},
-                            { name: 'Height:', value: data.height},
-                            { name: 'Bloodtype:', value: data.bloodtype},
-                            { name: 'Group:', value: data.group},
-                            { name: 'Team:', value: data.team}
-                        )
-                        .setImage(data.img_url)
+                    const result = JSON.stringify(rows[0]);
+                    const data = JSON.parse(result);
 
+                    const bio = new Discord.MessageEmbed()
+                            .setColor(color)
+                            .setTitle(`${data.name}'s (${data.name_kanji}) Biography`)
+                            .addFields(
+                                { name: 'Nickname:', value: data.nickname},
+                                { name: 'Birthdate:', value: data.birthdate},
+                                { name: 'Birthplace:', value: data.birthplace},
+                                { name: 'Height:', value: data.height},
+                                { name: 'Bloodtype:', value: data.bloodtype},
+                                { name: 'Group:', value: data.group},
+                                { name: 'Team:', value: data.team}
+                            )
+                            .setImage(data.img_url)
+
+                    con.release();
+                    
                     return message.channel.send(bio);
-            })
-        }
-        else if (args[0] === 'hkt48')
+                })
+            }
+        })
+        /* else if (args[0] === 'hkt48')
         {
             const color = '#000000';
 
@@ -165,7 +170,7 @@ module.exports = {
 
                 return message.channel.send(bio);
             }
-        }
+        } */
 
         /* message.channel.send('Argument Error: Cannot Find Member from the Specified Group!');
         message.channel.send(`Group: ${args[0]}`);
