@@ -19,43 +19,49 @@ module.exports = {
     execute(message, args) {
         pool.getConnection((err, con) => 
         {
-            if (args[0] === 'akb48')
+            if (args[0] === 'akb48') var color = '#ff69b3';
+            else if (args[0] === 'hkt48') var color = '#000000';
+            else if (args[0] === 'ngt48') var color = '#ff0000';
+            else if (args[0] === 'nmb48') var color = '#eb9d47';
+            else if (args[0] === 'ske48') var color = '#f7b501';
+            else if (args[0] === 'stu48') var color = '#d0e7f9';
+
+            con.query(`SELECT * FROM ` + args[0]+ ` WHERE short='` + args[1] + `'`, function (err, rows)
             {
-                const color = '#ff69b3';
-
-                con.query(`SELECT * FROM ` + args[0]+ ` WHERE short='` + args[1] + `'`, function (err, rows)
+                if (err) 
                 {
-                    if (err) throw err;
+                    message.channel.send(`Argument Error: Cannot Find Specified Group!\nGroup: ${args[0]}`);
+                    return;
+                };
 
-                    if (rows[0] == undefined)
-                    {
-                        message.channel.send(`Argument Error: Cannot Find Member from the Specified Group!\nGroup: ${args[0]}\nMember Name: ${args[1]}`);
-                        return;
-                    }
+                if (rows[0] == undefined)
+                {
+                    message.channel.send(`Argument Error: Cannot Find Member from the Specified Group!\nGroup: ${args[0]}\nMember Name: ${args[1]}`);
+                    return;
+                }
 
-                    const result = JSON.stringify(rows[0]);
-                    const data = JSON.parse(result);
+                const result = JSON.stringify(rows[0]);
+                const data = JSON.parse(result);
 
-                    const bio = new Discord.MessageEmbed()
-                            .setColor(color)
-                            .setTitle(`${data.name}'s (${data.name_kanji}) Biography`)
-                            .addFields(
-                                { name: 'Nickname:', value: data.nickname},
-                                { name: 'Birthdate:', value: data.birthdate},
-                                { name: 'Birthplace:', value: data.birthplace},
-                                { name: 'Height:', value: data.height},
-                                { name: 'Bloodtype:', value: data.bloodtype},
-                                { name: 'Group:', value: data.group},
-                                { name: 'Team:', value: data.team}
-                            )
-                            .setImage(data.img_url)
+                const bio = new Discord.MessageEmbed()
+                .setColor(color)
+                .setTitle(`${data.name}'s (${data.name_kanji}) Biography`)
+                .addFields(
+                    { name: 'Nickname:', value: data.nickname},
+                    { name: 'Birthdate:', value: data.birthdate},
+                    { name: 'Birthplace:', value: data.birthplace},
+                    { name: 'Height:', value: data.height},
+                    { name: 'Bloodtype:', value: data.bloodtype},
+                    { name: 'Group:', value: data.group},
+                    { name: 'Team:', value: data.team}
+                )
+                .setImage(data.img_url)
 
-                    con.release();
+                con.release();
                     
-                    return message.channel.send(bio);
-                })
-            }
-        })
+                return message.channel.send(bio);
+            })
+    })
         /* else if (args[0] === 'hkt48')
         {
             const color = '#000000';
