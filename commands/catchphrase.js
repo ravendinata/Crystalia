@@ -41,6 +41,12 @@ module.exports = {
                 const result = JSON.stringify(rows[0]);
                 const data = JSON.parse(result);
 
+                if (data.catchphrase == null)
+                {
+                    message.channel.send(`Unfortunately, ${data.name}'s Catchphrase is currently unavailable.`);
+                    return;
+                }
+
                 const bio = new Discord.MessageEmbed()
                 .setColor(color)
                 .setTitle(`${data.name}'s (${data.name_kanji}) Catchphrase`)
