@@ -18,8 +18,15 @@ module.exports = {
 	name: 'bio',
     description: 'Displays bio of selected member',
     execute(message, args) {
+        if (args[0] == undefined)
+        {
+            message.channel.send(`No arguments found! Use "bio --help" to get arguments list!`);
+            return;
+        }
+
         pool.getConnection((err, con) => 
         {
+
             if (args[0] === 'akb48') var color = '#ff69b3';
             else if (args[0] === 'hkt48') var color = '#000000';
             else if (args[0] === 'ngt48') var color = '#ff0000';

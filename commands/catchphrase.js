@@ -12,6 +12,11 @@ module.exports = {
 	name: 'catchphrase',
     description: 'Displays catchphrase of selected member',
     execute(message, args) {
+        if (args[0] == undefined)
+        {
+            message.channel.send(`No arguments found! Use "catchphrase --help" to get arguments list!`);
+            return;
+        }
 
         pool.getConnection((err, con) => 
         {
