@@ -24,6 +24,19 @@ module.exports = {
             return;
         }
 
+        if (args[0] == '-help')
+        {
+            const content = new Discord.MessageEmbed()
+                .setColor('#ffffff')
+                .setTitle(`Crystalia Bio Help`)
+                .addFields(
+                    { name: 'First Argument', value: 'This should be the group name.\nCurrently Available Groups:\n-AKB48\n-SKE48\n-HKT48\n-NMB48\n-NGT48\n-STU48'},
+                    { name: 'Second Argument', value: 'This should be the name of the member in the order of: Surname + Name\nThe name may be typed in any letter case.\nNote: For members who have the exact same name (Eg: Yokoyama Yui (Team A) and Yokoyama Yui (Team 8)), please add the team letter/number after the name argument.'},
+                    { name: 'Example', value: `bio -akb48 -oguriyui (For Team 8's Oguri Yui)\nor\nbio -akb48 -yokoyamayui8 (For Team 8's Yokoyama Yui)`}
+                )
+            return message.channel.send(content);
+        }
+
         pool.getConnection((err, con) => 
         {
 
