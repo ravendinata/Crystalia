@@ -47,7 +47,7 @@ module.exports = {
             else if (args[0] === 'ske48') var color = '#f7b501';
             else if (args[0] === 'stu48') var color = '#d0e7f9';
 
-            con.query(`SELECT * FROM ` + args[0]+ ` WHERE short='` + args[1] + `'`, function (err, rows)
+            con.query(`SELECT * FROM ` + args[0] + ` WHERE short='` + args[1] + `' OR common='` + args[1] + `'`, function (err, rows)
             {
                 if (err) 
                 {
