@@ -54,7 +54,7 @@ module.exports = {
                     message.channel.send(`Argument Error: Cannot find specified group ${args[0].toUpperCase()}!`);
                     message.channel.send(`Only Japan groups (AKB48, HKT48, NGT48, NMB48, SKE48, STU48) are available at the moment.`);
                     return;
-                };
+                }
 
                 if (rows[0] == undefined)
                 {
