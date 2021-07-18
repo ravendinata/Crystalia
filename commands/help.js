@@ -4,32 +4,33 @@ module.exports = {
 	name: 'help',
 	description: 'Help me',
 	execute(message, args) {
-        if (args[0] === 'a' || args[0] === undefined)  
+        if (args[0] === undefined)
         {
             const content = new Discord.MessageEmbed()
-                .setColor('#ffffff')
-                .setTitle(`Crystalia Commands`)
-                .addFields(
-                    { name: 'Bio', value: 'Bio is used to retrieve biodata of a member. Currently only works with Japan members.\nFormat: bio -[group] -[memberName]\nExample: bio -akb48 -oguriYui'},
-                    { name: 'Catchphrase', value: 'Catchphrase is used to print the catchphrase of a member. Only works with Japan members.\nFormat: catchphrase -[group] -[memberName]\nExample: catchphrase -akb48 -oguriYui'},
-                    { name: 'About', value: 'Displays About Page.\nCommand: about'}
-                )
-                .setDescription(`The next time you forget the commands, you can try using 'help -s' for a summary of the commands only!`)
-                .setFooter('Thank you for using Crystalia!')
+            .setColor('#ffffff')
+            .setTitle(`Crystalia Commands`)
+            .addFields(
+                { name: 'Bio', value: '`bio [group] [memberName]`\n`Example: bio akb48 oguriYui`'},
+                { name: 'Catchphrase', value: '`catchphrase [group] [memberName]`\n`Example: catchphrase akb48 oguriYui`'},
+                { name: 'About', value: '`about`'}
+            )
+            .setDescription(`Use 'help -a' for a detailed list of the commands.\n**Note: Always add the prefix before the command!**`)
+            .setFooter('Thank you for using Crystalia!')
             
             return message.channel.send(content);
         }
-        else if (args[0] === 's')
+        else if (args[0] === '-a')  
         {
             const content = new Discord.MessageEmbed()
-                .setColor('#ffffff')
-                .setTitle(`Crystalia Commands`)
-                .addFields(
-                    { name: 'Bio', value: 'bio -[group] -[memberName]\nExample: bio -akb48 -oguriYui'},
-                    { name: 'Catchphrase', value: 'catchphrase -[group] -[memberName]\nExample: catchphrase -akb48 -oguriYui'},
-                    { name: 'About', value: 'about'}
-                )
-                .setFooter('Thank you for using Crystalia!')
+            .setColor('#ffffff')
+            .setTitle(`Crystalia Commands`)
+            .addFields(
+                { name: 'Bio', value: 'Bio is used to retrieve biodata of a member.\nCurrently only works with Japan members.\n`Format: bio [group] [memberName or common nickname]`\n`Example: bio akb48 oguriYui`'},
+                { name: 'Catchphrase', value: 'Catchphrase is used to print the catchphrase of a member.\nCurrently only works with Japan members.\n`Format: catchphrase [group] [memberName or common nickname]`\n`Example: catchphrase akb48 oguriYui`'},
+                { name: 'About', value: 'Displays About Page.\n`Command: about`'}
+            )
+            .setDescription(`**Note: Always add the prefix before the command!**`)
+            .setFooter('Thank you for using Crystalia!')
             
             return message.channel.send(content);
         }

@@ -24,16 +24,17 @@ module.exports = {
             return;
         }
 
-        if (args[0] == '-help')
+        if (args[0] == '--help')
         {
             const content = new Discord.MessageEmbed()
-                .setColor('#ffffff')
-                .setTitle(`Crystalia Bio Help`)
-                .addFields(
-                    { name: 'First Argument', value: 'This should be the group name.\nCurrently Available Groups:\n-AKB48\n-SKE48\n-HKT48\n-NMB48\n-NGT48\n-STU48'},
-                    { name: 'Second Argument', value: 'This should be the name of the member in the order of: Surname + Name\nThe name may be typed in any letter case.\nNote: For members who have the exact same name (Eg: Yokoyama Yui (Team A) and Yokoyama Yui (Team 8)), please add the team letter/number after the name argument.'},
-                    { name: 'Example', value: `bio -akb48 -oguriyui (For Team 8's Oguri Yui)\nor\nbio -akb48 -yokoyamayui8 (For Team 8's Yokoyama Yui)`}
-                )
+            .setColor('#ffffff')
+            .setTitle(`Crystalia Bio Help`)
+            .addFields(
+                { name: 'First Argument', value: '***Group name***\nCurrently Available Groups:\n-AKB48\n-SKE48\n-HKT48\n-NMB48\n-NGT48\n-STU48'},
+                { name: 'Second Argument', value: '***Member name in the order of: Surname + Name*** or ***common nickname of the member***\n\n*) The name may be typed in any letter case.\n\nNote: For members who have the exact same name (Eg: Yokoyama Yui (Team A) and Yokoyama Yui (Team 8)), please add the team letter/number after the name argument.'},
+                { name: 'Example', value: "`bio akb48 yuiyui (For Team 8's Oguri Yui - using Nickname)`\nor\n`bio akb48 oguriyui (For Team 8's Oguri Yui - using Full Name)`\nor\n`bio akb48 yokoyamayui8 (For Team 8's Yokoyama Yui)`"}
+            )
+            
             return message.channel.send(content);
         }
 
