@@ -1,11 +1,20 @@
-const Discord = require('discord.js');
-var mysql = require('mysql');
+require('dotenv').config();
 
+const Discord = require('discord.js');
+const prefix = process.env.prefix;
+
+/* 
+    USE POOLING
+    -----------
+    Helps prevent module from being disconnedted after long period of inactivity.
+    Use .env to add the server details!
+*/
+var mysql = require('mysql');
 var pool = mysql.createPool({
-    host: 'us-cdbr-east-02.cleardb.com',
-    user: 'bf0b2d2a04cd04',
-    password: 'c82ad2e3',
-    database: 'heroku_774353f79cb52ed'
+    host: process.env.db_host,
+    user: process.env.db_user,
+    password: process.env.db_password,
+    database: process.env.db_name
 });
 
 module.exports = {
@@ -26,7 +35,9 @@ module.exports = {
             .addFields(
                 { name: 'First Argument', value: '***Group name***\nCurrently Available Groups:\n-AKB48\n-SKE48\n-HKT48\n-NMB48\n-NGT48\n-STU48'},
                 { name: 'Second Argument', value: '***Member name in the order of: Surname + Name*** or ***common nickname of the member***\n\n*) The name may be typed in any letter case.\n\nNote: For members who have the exact same name (Eg: Yokoyama Yui (Team A) and Yokoyama Yui (Team 8)), please add the team letter/number after the name argument.'},
-                { name: 'Example', value: "`catchphrase akb48 yuiyui (For Team 8's Oguri Yui - using Nickname)`\nor\n`catchphrase akb48 oguriyui (For Team 8's Oguri Yui - using Full Name)`\nor\n`catchphrase akb48 yokoyamayui8 (For Team 8's Yokoyama Yui)`"}
+                { name: `Example (Team 8's Oguri Yui - using Nickname)`, value: `${prefix}catchphrase akb48 yuiyui`},
+                { name: `Example (Team 8's Oguri Yui - using Full Name)`, value: `${prefix}catchphrase akb48 oguriyui`},
+                { name: `Example (Team 8's Yokoyama Yui)`, value: `${prefix}catchphrase akb48 yokoyamayui8`}
             )
 
             return message.channel.send(content);
