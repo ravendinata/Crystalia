@@ -3,10 +3,12 @@ require('dotenv').config();
 const Discord = require('discord.js');
 const prefix = process.env.prefix;
 
-module.exports = {
+module.exports = 
+{
 	name: 'help',
 	description: 'Help me',
-	execute(message, args) {
+	execute(message, args) 
+    {
         if (args[0] === undefined)
         {
             const content = new Discord.MessageEmbed()

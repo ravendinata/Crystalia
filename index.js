@@ -1,4 +1,4 @@
-require('dotenv').config(); 
+require('dotenv').config();
 
 const Discord = require('discord.js');
 const fs = require('fs');
@@ -9,7 +9,8 @@ client.commands = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-for (const file of commandFiles) {
+for (const file of commandFiles) 
+{
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
 }
@@ -28,7 +29,10 @@ client.on('message', message => {
 
 	try {
 		client.commands.get(command).execute(message, args);
-	    console.info(`Called command: ${command} with argument ${args}`);
+		if (args[0] == undefined)
+			console.info(`Called command: ${command} with no arguments`);
+		else
+	    	console.info(`Called command: ${command} with argument ${args}`);
 	} catch (error) {
 		console.error(error);
 		message.reply('There was an error trying to execute that command!');

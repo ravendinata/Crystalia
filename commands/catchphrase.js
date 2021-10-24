@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const Discord = require('discord.js');
+const cl = require('../utils/crystaliaLibrary.js');
 const prefix = process.env.prefix;
 
 /* 
@@ -17,10 +18,12 @@ var pool = mysql.createPool({
     database: process.env.db_name
 });
 
-module.exports = {
+module.exports = 
+{
 	name: 'catchphrase',
     description: 'Displays catchphrase of selected member',
-    execute(message, args) {
+    execute(message, args) 
+    {
         if (args[0] == undefined)
         {
             message.channel.send(`No arguments found! Use "catchphrase --help" to get arguments list!`);
@@ -45,12 +48,7 @@ module.exports = {
 
         pool.getConnection((err, con) => 
         {
-            if (args[0] === 'akb48') var color = '#ff69b3';
-            else if (args[0] === 'hkt48') var color = '#000000';
-            else if (args[0] === 'ngt48') var color = '#ff0000';
-            else if (args[0] === 'nmb48') var color = '#eb9d47';
-            else if (args[0] === 'ske48') var color = '#f7b501';
-            else if (args[0] === 'stu48') var color = '#d0e7f9';
+            color = cl.getGroupColour(args[0]);
 
             con.query(`SELECT * FROM ` + args[0] + ` WHERE short='` + args[1] + `' OR common='` + args[1] + `'`, function (err, rows)
             {
@@ -71,7 +69,9 @@ module.exports = {
                 const result = JSON.stringify(rows[0]);
                 const data = JSON.parse(result);
 
-                if (data.catchphrase == null)
+                // console.info(`CP: ${data.catchphrase}`); // Test Point
+
+                if (!data.catchphrase)
                 {
                     message.channel.send(`Unfortunately, ${data.name}'s Catchphrase is currently unavailable.`);
                     return;
