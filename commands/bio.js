@@ -24,6 +24,8 @@ var pool = mysql.createPool({
     console.log("Connected to Database!");
 })  */
 
+console.info("Bio Module Initialized!");
+
 module.exports = 
 {
 	name: 'bio',

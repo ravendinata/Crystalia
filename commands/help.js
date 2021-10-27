@@ -3,6 +3,8 @@ require('dotenv').config();
 const Discord = require('discord.js');
 const prefix = process.env.prefix;
 
+console.info("Help Module Initialized!");
+
 module.exports = 
 {
 	name: 'help',

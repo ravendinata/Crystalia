@@ -58,6 +58,8 @@ pool.getConnection((err, con) =>
     })
 })
 
+console.info("Trivia Module Initialized!");
+
 module.exports = 
 {
     name: 'trivia',

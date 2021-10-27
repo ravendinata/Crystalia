@@ -18,6 +18,8 @@ var pool = mysql.createPool({
     database: process.env.db_name
 });
 
+console.info("Catchphrase Module Initialized!");
+
 module.exports = 
 {
 	name: 'catchphrase',
