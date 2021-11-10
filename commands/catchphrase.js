@@ -48,7 +48,7 @@ module.exports =
             return message.channel.send(content);
         }
 
-        pool.getConnection((err, con) => 
+        pool.getConnection((err, con) =>
         {
             color = cl.getGroupColour(args[0]);
 
@@ -92,5 +92,5 @@ module.exports =
                 return message.channel.send(bio);
             })
         })
-    },
+    }
 };

@@ -81,13 +81,13 @@ module.exports =
                 .setColor(color)
                 .setTitle(`${data.name}'s (${data.name_kanji}) Biography`)
                 .addFields(
-                    { name: 'Nickname:', value: data.nickname},
-                    { name: 'Birthdate:', value: data.birthdate},
-                    { name: 'Birthplace:', value: data.birthplace},
-                    { name: 'Height:', value: data.height},
-                    { name: 'Bloodtype:', value: data.bloodtype},
-                    { name: 'Group:', value: data.group},
-                    { name: 'Team:', value: data.team}
+                    { name: 'Nickname:', value: data.nickname },
+                    { name: 'Birthdate:', value: data.birthdate },
+                    { name: 'Birthplace:', value: data.birthplace },
+                    { name: 'Height:', value: data.height },
+                    { name: 'Bloodtype:', value: data.bloodtype },
+                    { name: 'Group:', value: data.group },
+                    { name: 'Team:', value: data.team }
                 )
                 .setImage(data.img_url)
 
@@ -96,5 +96,5 @@ module.exports =
                 return message.channel.send(bio);
             })
         })
-    },
+    }
 };

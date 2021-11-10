@@ -5,7 +5,7 @@ console.info("About Module Initialized!");
 module.exports = 
 {
 	name: 'about',
-	description: 'about page',
+	description: 'About Page',
 	execute(message) 
     {
 		const content = new Discord.MessageEmbed()

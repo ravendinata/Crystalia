@@ -15,7 +15,8 @@ for (const file of commandFiles)
 	client.commands.set(command.name, command);
 }
 
-client.once('ready', () => {
+client.once('ready', () => 
+{
 	console.info(`\n========================================`);
 	console.log(`Ready! Logged in as ${client.user.tag}`);
 	console.info(`========================================`);
@@ -29,13 +30,17 @@ client.on('message', message => {
 
 	if (!client.commands.has(command)) return;
 
-	try {
+	try 
+	{
 		if (args[0] == undefined)
 			console.info(`Called command: ${command} with no arguments`);
 		else
 	    	console.info(`Called command: ${command} with argument ${args}`);
+		
 		client.commands.get(command).execute(message, args);
-	} catch (error) {
+	} 
+	catch (error)
+	{
 		console.error(error);
 		message.reply('There was an error trying to execute that command!');
 	}

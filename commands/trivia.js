@@ -77,8 +77,8 @@ module.exports =
                 {
                     if (err || rows[0] == undefined)
                     {
-                        message.channel.send(`We have just encountered an error. Please try again later.`);
-                        return;
+                        console.info(err);
+                        return message.channel.send(`We have just encountered an error. Please try again later.`);
                     }
 
                     return message.channel.send(createEmbed(rows[0]));
@@ -93,16 +93,12 @@ module.exports =
                 {
                     if (err)
                     {
-                        message.channel.send(`We have just encountered an error. Please try again later.`);
                         console.info(err);
-                        return;
+                        return message.channel.send(`We have just encountered an error. Please try again later.`);
                     }
 
                     if (rows[0] == undefined)
-                    {
-                        message.channel.send(`We can't seem to find anything with that argument/parameter :(`);
-                        return;
-                    }
+                        return message.channel.send(`We can't seem to find anything with that argument/parameter :(`);
 
                     var min = 0;
                     var max = rows.length-1;
