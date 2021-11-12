@@ -1,11 +1,13 @@
 require('dotenv').config();
 
+/* GLOBALS */
 const Discord = require('discord.js');
 const cl = require('../utils/crystaliaLibrary.js');
 
 var MAX_ITEM;
 var last = -1;
 
+/* SQL Pool */
 var mysql = require('mysql');
 var pool = mysql.createPool({
     host: process.env.db_host,
@@ -14,41 +16,11 @@ var pool = mysql.createPool({
     database: process.env.db_name
 });
 
-function setItemMax(max) { MAX_ITEM = max; }
-
-function createEmbed(plainData)
-{
-    console.info(`Creating embed...`);
-    const result = JSON.stringify(plainData);
-    const data = JSON.parse(result);
-
-    console.info(data);
-
-    const color = cl.getGroupColour(data.groupName);
-
-    const output = new Discord.MessageEmbed()
-    .setColor(color)
-    .setTitle(`Trivia`)
-    .setDescription(data.trivia);
-
-    console.info(`Posting embed...`);
-    return output;
-}
-
-function chooseTrivia(min, max)
-{
-    var change = 0;
-
-    var sel = cl.selectRandomAndCompare(min, max, last, change);
-    change = sel.change;
-    console.info(`=== DEBUG ===\n> Last TID: ${last} | Curr TID: ${sel.id} | C: ${change}`);
-    last = sel.id;
-
-    return sel.id;
-}
-
 pool.getConnection((err, con) =>
 {
+    if (err)
+        return console.info(err);
+
     con.query(`SELECT COUNT(id) AS items FROM trivia`, function (err, rows)
     {
         const result = JSON.stringify(rows[0]);
@@ -57,6 +29,8 @@ pool.getConnection((err, con) =>
         setItemMax(data.items);
     })
 })
+
+/* Command Begin */
 
 console.info("Trivia Module Initialized!");
 
@@ -110,4 +84,41 @@ module.exports =
             })
         }
     }
+}
+
+/*   Command End
+   ===============
+   Extra Functions   */
+
+function setItemMax(max) { MAX_ITEM = max; }
+
+function createEmbed(plainData)
+{
+    console.info(`Creating embed...`);
+    const result = JSON.stringify(plainData);
+    const data = JSON.parse(result);
+
+    console.info(data);
+
+    const color = cl.getGroupColour(data.groupName);
+
+    const output = new Discord.MessageEmbed()
+    .setColor(color)
+    .setTitle(`Trivia`)
+    .setDescription(data.trivia);
+
+    console.info(`Posting embed...`);
+    return output;
+}
+
+function chooseTrivia(min, max)
+{
+    var change = 0;
+
+    var sel = cl.selectRandomAndCompare(min, max, last, change);
+    change = sel.change;
+    console.info(`=== DEBUG ===\n> Last TID: ${last} | Curr TID: ${sel.id} | C: ${change}`);
+    last = sel.id;
+
+    return sel.id;
 }

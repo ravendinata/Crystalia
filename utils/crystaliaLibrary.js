@@ -109,9 +109,9 @@ function getRoomId(group, short)
 }
 
 
-/* =======================
-    EXPORTED FUNCTIONS
-======================= */
+/** ====================
+ * * MODULE EXPORTS * * 
+===================== */
 
 module.exports =
 {

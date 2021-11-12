@@ -1,7 +1,7 @@
-/* 
-    ALIAS for showroom command 
+/** 
+    ALIAS for showroom command
     ==========================
-    Extra Path! Need to reimplement!
+    * TODO: This Method takes extra path! Try to reimplement.
 */
 
 module.exports =

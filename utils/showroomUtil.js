@@ -20,6 +20,17 @@ function getUrlKey(url) { return url.replace(BASE_URL + '/', ''); }
     EXPORTED FUNCTIONS
 ======================= */
 
+/**
+ * * Get a list of members onlive/streaming, then
+ * * formats the data into Discord Embed format, then
+ * * sends the Embed to the requesting server.channel.
+ * ============================================================================
+ * @param message   : Message Return Address
+ * @param param     : Search parameters (Can take any filter)
+ *                    Doesn't need to be [groupName] [memberShort/memberCommon]
+ * ============================================================================
+ * TODO: Fix divider printing at the end of a list
+ */
 function getOnlive(message, param)
 {
     fetch(BASE_ONLIVE_API_URL, METHOD_GET)
@@ -90,6 +101,19 @@ function getOnlive(message, param)
     })
 }
 
+/**
+ * * Get room ID from database (uses regular member search format), then
+ * * uses the room ID to get room data from API, then
+ * * creates a Discord Embed and formats the data for display, then
+ * * sends the Embed to the requesting server.channel.
+ * ============================================================================
+ * @param message   : Message Return Address
+ * @param group     : The group of the member requested (ex: AKB48)
+ * @param short     : The member identifier, could be memberShort or common
+ *                    (ex: yamauchimizuki or zukkii)
+ * ============================================================================
+ * ? Need to add more info fields?
+ */
 async function getRoomInfo(message, group, short)
 {
     const room_id = await cl.getRoomId(group, short);
@@ -136,6 +160,19 @@ async function getRoomInfo(message, group, short)
     })
 }
 
+/**
+ * * Get room ID from database (uses regular member search format), then
+ * * uses the room ID to get next live time from API, then
+ * * creates a Discord Embed and formats the data for display, then
+ * * sends the Embed to the requesting server.channel.
+ * ============================================================================
+ * @param message   : Message Return Address
+ * @param group     : The group of the member requested (ex: AKB48)
+ * @param short     : The member identifier, could be memberShort or common
+ *                    (ex: yamauchimizuki or zukkii)
+ * ============================================================================
+ * ? Change display formatting?
+ */
 async function getNextLive(message, group, short)
 {
     const room_id = await cl.getRoomId(group, short);
@@ -159,6 +196,23 @@ async function getNextLive(message, group, short)
     })
 }
 
+/**
+ * * Get room ID from database (uses regular member search format), then
+ * * uses the room ID to get stage user list from API, then
+ * * creates a Discord Embed and formats the data for display, then
+ * * sends the Embed to the requesting server.channel.
+ *
+ *   Note:
+ *   Stage User = Users that qualify in the Top 100 Live Rankking
+ * ============================================================================
+ * @param message   : Message Return Address
+ * @param group     : The group of the member requested (ex: AKB48)
+ * @param short     : The member identifier, could be memberShort or common
+ *                    (ex: yamauchimizuki or zukkii)
+ * @param n         : Number of stage users to display (1-n)
+ * ============================================================================
+ * ? Change 'n' parameter name?
+ */
 async function getStageUserList(message, group, short, n = 13)
 {
     const room_id = await cl.getRoomId(group, short);
@@ -196,9 +250,9 @@ async function getStageUserList(message, group, short, n = 13)
 }
 
 
-/*========================================
-    MODULE EXPORTS
-========================================*/
+/** ====================
+ * * MODULE EXPORTS * * 
+===================== */
 
 module.exports =
 {
