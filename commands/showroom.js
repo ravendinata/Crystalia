@@ -14,7 +14,7 @@ module.exports =
 
         switch(opt)
         {
-            case "onlive": case "streaming": case undefined:
+            default: case "onlive": case "streaming":
                 console.time(`[PM] On Live`);
                 showroomClient.getOnlive(message, param);
                 console.timeEnd(`[PM] On Live`);
@@ -36,9 +36,6 @@ module.exports =
                 console.time(`[PM] Next Live`);
                 showroomClient.getStageUserList(message, param, optParam);
                 console.timeEnd(`[PM] Next Live`);
-                break;
-
-            default:
                 break;
         }
     }

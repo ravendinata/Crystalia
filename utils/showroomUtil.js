@@ -29,7 +29,6 @@ function getUrlKey(url) { return url.replace(BASE_URL + '/', ''); }
  * @param param     : Search parameters (Can take any filter)
  *                    Doesn't need to be [groupName] [memberShort/memberCommon]
  * ============================================================================
- * TODO: Fix divider printing at the end of a list
  */
 function getOnlive(message, param)
 {
@@ -93,7 +92,7 @@ function getOnlive(message, param)
 
             embed.addField(title, `${string}\n\u200B`);
 
-            if (names % 10 == 9)
+            if (names % 10 == 9 && names != liveCount-1)
                 embed.addField('\u200B\n::: Break :::', '\u200B');
         }
 
