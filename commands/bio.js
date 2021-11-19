@@ -30,6 +30,7 @@ module.exports =
 {
 	name: 'bio',
     description: 'Displays bio of selected member',
+    aliases: ["biography", "profile", "memberinfo"],
     execute(message, args) 
     {
         if (args[0] == undefined)

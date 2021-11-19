@@ -19,10 +19,19 @@ var pool = mysql.createPool({
 pool.getConnection((err, con) =>
 {
     if (err)
-        return console.info(err);
+    {
+        console.info(err);
+        return -1;
+    }
 
     con.query(`SELECT COUNT(id) AS items FROM trivia`, function (err, rows)
     {
+        if (err)
+        {
+            console.info(err);
+            return -1;
+        }
+
         const result = JSON.stringify(rows[0]);
         const data = JSON.parse(result);
 
@@ -55,6 +64,8 @@ module.exports =
                         return message.channel.send(`We have just encountered an error. Please try again later.`);
                     }
 
+                    con.release();
+
                     return message.channel.send(createEmbed(rows[0]));
                 })
             })
@@ -78,6 +89,8 @@ module.exports =
                     var max = rows.length-1;
 
                     var id = chooseTrivia(min, max);
+
+                    con.release();
 
                     return message.channel.send(createEmbed(rows[id]));
                 })
@@ -113,11 +126,8 @@ function createEmbed(plainData)
 
 function chooseTrivia(min, max)
 {
-    var change = 0;
-
-    var sel = cl.selectRandomAndCompare(min, max, last, change);
-    change = sel.change;
-    console.info(`=== DEBUG ===\n> Last TID: ${last} | Curr TID: ${sel.id} | C: ${change}`);
+    var sel = cl.selectRandomAndCompare(min, max, last);
+    console.info(`=== DEBUG ===\n> Last TID: ${last} | Curr TID: ${sel.id} | C: ${sel.change}`);
     last = sel.id;
 
     return sel.id;

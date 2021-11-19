@@ -6,6 +6,7 @@ const prefix = process.env.prefix;
 const client = new Discord.Client();
 
 client.commands = new Discord.Collection();
+client.aliases = new Discord.Collection();
 
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
@@ -13,31 +14,39 @@ for (const file of commandFiles)
 {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
+
+	if (command.aliases != null)
+	{
+		for (const alias of command.aliases)
+			client.aliases.set(alias, command);
+	}
 }
 
 client.once('ready', () => 
 {
 	console.info(`\n========================================`);
-	console.log(`Ready! Logged in as ${client.user.tag}`);
+	console.info(`Ready! Logged in as ${client.user.tag}`);
 	console.info(`========================================`);
 });
 
-client.on('message', message => {
+client.on('message', message => 
+{
     if (!message.content.toLowerCase().startsWith(prefix) || message.author.bot) return;
 
 	const args = message.content.slice(prefix.length).toLowerCase().split(" ");
 	const command = args.shift().toLowerCase();
 
-	if (!client.commands.has(command)) return;
+	if (!client.commands.has(command) && !client.aliases.has(command)) return;
 
-	try 
+	try
 	{
 		if (args[0] == undefined)
 			console.info(`Called command: ${command} with no arguments`);
 		else
 	    	console.info(`Called command: ${command} with argument ${args}`);
 		
-		client.commands.get(command).execute(message, args);
+		const executable = client.commands.get(command) || client.aliases.get(command);
+		executable.execute(message, args);
 	} 
 	catch (error)
 	{

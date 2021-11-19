@@ -14,6 +14,7 @@ const BASE_URL = "https://www.showroom-live.com";
 const BASE_API_URL = "https://www.showroom-live.com/api";
 const BASE_ONLIVE_API_URL = "https://www.showroom-live.com/api/live/onlives";
 
+/* Breaks down raw URL into only URL key */
 function getUrlKey(url) { return url.replace(BASE_URL + '/', ''); }
 
 /* =======================
@@ -21,14 +22,14 @@ function getUrlKey(url) { return url.replace(BASE_URL + '/', ''); }
 ======================= */
 
 /**
- * * Get a list of members onlive/streaming, then
- * * formats the data into Discord Embed format, then
- * * sends the Embed to the requesting server.channel.
- * ============================================================================
- * @param message   : Message Return Address
- * @param param     : Search parameters (Can take any filter)
- *                    Doesn't need to be [groupName] [memberShort/memberCommon]
- * ============================================================================
+ *
+ * Get a list of members onlive/streaming,
+ * then formats the data into Discord Embed format,
+ * then sends the Embed to the requesting server.channel.
+ *
+ * @param message   Message Return Address
+ * @param param     Search parameters (Can take any filter).
+ *                  Doesn't need to be [groupName] [memberShort/memberCommon]
  */
 function getOnlive(message, param)
 {
@@ -58,7 +59,7 @@ function getOnlive(message, param)
         }
 
         const liveCount = result.length;
-        const embed = new Discord.MessageEmbed().setColor("ffffff");
+        let embed = new Discord.MessageEmbed().setColor("ffffff");
 
         if (liveCount <= 0)
         {
@@ -72,14 +73,14 @@ function getOnlive(message, param)
         else
         {
             if (param == undefined)
-                embed.setTitle(`:satellite:  Members Currently Streaming`)
+                embed.setTitle(`:satellite:  Members Currently Streaming | Page 1`)
                      .setFooter(`Members/Rooms Streaming: ${liveCount}`);
             else
-                embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming`)
+                embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page 1`)
                      .setFooter(`'${param}' search results: ${liveCount}`)
         }
 
-        for (let string, title, names = 0; names < liveCount; names++)
+        for (let string, title, page = 1, names = 0; names < liveCount; names++)
         {
             string = `https://www.showroom-live.com/${result[names].room_url_key}`;
             title = result[names].main_name;
@@ -92,26 +93,43 @@ function getOnlive(message, param)
 
             embed.addField(title, `${string}\n\u200B`);
 
-            if (names % 10 == 9 && names != liveCount-1)
+            if (names % 20 == 9 && names != liveCount-1)
                 embed.addField('\u200B\n::: Break :::', '\u200B');
+
+            if (names % 20 == 19 && names >= 19 && names != liveCount-1)
+            {
+                message.channel.send(embed)
+                embed = new Discord.MessageEmbed().setColor("ffffff");
+                
+                ++page;
+
+                if (param == undefined)
+                    embed.setTitle(`:satellite:  Members Currently Streaming | Page ${page}`)
+                         .setFooter(`Members/Rooms Streaming: ${liveCount}`);
+                else
+                    embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page ${page}`)
+                         .setFooter(`'${param}' search results: ${liveCount}`)
+            }
         }
+
+        console.info(`> ${liveCount} Members Streaming | Success!`);
 
         return message.channel.send(embed);
     })
 }
 
 /**
- * * Get room ID from database (uses regular member search format), then
- * * uses the room ID to get room data from API, then
- * * creates a Discord Embed and formats the data for display, then
- * * sends the Embed to the requesting server.channel.
- * ============================================================================
- * @param message   : Message Return Address
- * @param group     : The group of the member requested (ex: AKB48)
- * @param short     : The member identifier, could be memberShort or common
- *                    (ex: yamauchimizuki or zukkii)
- * ============================================================================
+ * Get room ID from database (uses regular member search format), then
+ * uses the room ID to get room data from API, then
+ * creates a Discord Embed and formats the data for display, then
+ * sends the Embed to the requesting server.channel.
+ * 
  * ? Need to add more info fields?
+ * 
+ * @param message   Message Return Address
+ * @param group     The group of the member requested (ex: AKB48)
+ * @param short     The member identifier, could be memberShort or common
+ *                  (ex: yamauchimizuki or zukkii)
  */
 async function getRoomInfo(message, group, short)
 {
@@ -160,17 +178,17 @@ async function getRoomInfo(message, group, short)
 }
 
 /**
- * * Get room ID from database (uses regular member search format), then
- * * uses the room ID to get next live time from API, then
- * * creates a Discord Embed and formats the data for display, then
- * * sends the Embed to the requesting server.channel.
- * ============================================================================
- * @param message   : Message Return Address
- * @param group     : The group of the member requested (ex: AKB48)
- * @param short     : The member identifier, could be memberShort or common
- *                    (ex: yamauchimizuki or zukkii)
- * ============================================================================
+ * Get room ID from database (uses regular member search format), then
+ * uses the room ID to get next live time from API, then
+ * creates a Discord Embed and formats the data for display, then
+ * sends the Embed to the requesting server.channel.
+ * 
  * ? Change display formatting?
+ * 
+ * @param message   Message Return Address
+ * @param group     The group of the member requested (ex: AKB48)
+ * @param short     The member identifier, could be memberShort or common
+ *                  (ex: yamauchimizuki or zukkii)
  */
 async function getNextLive(message, group, short)
 {
@@ -196,21 +214,21 @@ async function getNextLive(message, group, short)
 }
 
 /**
- * * Get room ID from database (uses regular member search format), then
- * * uses the room ID to get stage user list from API, then
- * * creates a Discord Embed and formats the data for display, then
- * * sends the Embed to the requesting server.channel.
+ * Get room ID from database (uses regular member search format), then
+ * uses the room ID to get stage user list from API, then
+ * creates a Discord Embed and formats the data for display, then
+ * sends the Embed to the requesting server.channel.
  *
- *   Note:
- *   Stage User = Users that qualify in the Top 100 Live Rankking
- * ============================================================================
- * @param message   : Message Return Address
- * @param group     : The group of the member requested (ex: AKB48)
- * @param short     : The member identifier, could be memberShort or common
- *                    (ex: yamauchimizuki or zukkii)
- * @param n         : Number of stage users to display (1-n)
- * ============================================================================
+ * Note:
+ * Stage User = Users that qualify in the Top 100 Live Rankking
+ * 
  * ? Change 'n' parameter name?
+ * 
+ * @param message   Message Return Address
+ * @param group     The group of the member requested (ex: AKB48)
+ * @param short     The member identifier, could be memberShort or common
+ *                  (ex: yamauchimizuki or zukkii)
+ * @param n         Number of stage users to display (1-n)
  */
 async function getStageUserList(message, group, short, n = 13)
 {
@@ -227,8 +245,6 @@ async function getStageUserList(message, group, short, n = 13)
     .then(json => 
     {
         const data = json.stage_user_list;
-
-        console.info(`> Data: ${data}`);
 
         if (data[0] == null)
         {
@@ -251,7 +267,7 @@ async function getStageUserList(message, group, short, n = 13)
 
 /** ====================
  * * MODULE EXPORTS * * 
-===================== */
+==================== **/
 
 module.exports =
 {

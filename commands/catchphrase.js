@@ -24,6 +24,7 @@ module.exports =
 {
 	name: 'catchphrase',
     description: 'Displays catchphrase of selected member',
+    aliases: ["cp", "jiko"],
     execute(message, args) 
     {
         if (args[0] == undefined)

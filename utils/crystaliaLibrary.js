@@ -20,6 +20,12 @@ var pool = mysql.createPool({
 
 // ========== Randomizer Functions ========== //
 
+/**
+ * Randomly select an integer within the defined min-max range,
+ *
+ * @param min    Minimum integer selected exclusive
+ * @param max    Maximum integer selected inclusive
+ */
 function randomInteger(min, max)
 {
     return Math.floor(Math.random() * (max - min)) + min;
@@ -30,9 +36,26 @@ function randomInteger(max)
     return Math.floor(Math.random() * max);
 }
 
-function selectRandomAndCompare(min, max, last, change = 0)
+
+/**
+ * Randomly select an integer within the defined min-max range,
+ * then compare with the last selected integer,
+ * use the comparison result to select a new integer last and current is same.
+ *
+ * Returns:
+ * id: Selected integer;
+ * change: Difference from last selected integer if selected int needs changing
+ *         due n == last;
+ * 
+ * @param min       Minimum integer selected exclusive
+ * @param max       Maximum integer selected inclusive
+ * @param last      Integer variable in the caller's scope representing 
+ *                  the last integer selected
+ */
+function selectRandomAndCompare(min, max, last)
 {
     var n = randomInteger(max) + min;
+    var change = 0;
 
     if (n == last && max != 0)
     {
@@ -50,9 +73,13 @@ function selectRandomAndCompare(min, max, last, change = 0)
 }
 
 
-// ========== Data / Info Puller ========== //
+// ========== Misc ========== //
 
-/* Colour Function */
+/**
+ * Simple utility that returns hex color value of different groups
+ * ? Use alternate method (enum) ?
+ * @param group Group name (ex: AKB48)
+ */
 function getGroupColour(group)
 {
     if (group === 'akb48') return '#ff69b3';
@@ -63,25 +90,41 @@ function getGroupColour(group)
     else if (group === 'stu48') return '#d0e7f9';
 }
 
-/* Converts UNIX Timestamp (Epoch) to hh:mm:ss time (24 hour) */
+/**
+ * Converts epoch (UNIX) time into formatted 24-hour time
+ * @param epoch Epoch time to be converted
+ */
 function convertEpochTo24hr(epoch)
 {
-    var date = new Date(epoch * 1000);
+    var date = new Date(epoch * 1000); // Convert epoch to date format
 
     var hh = date.getHours();
     var mm = "0" + date.getMinutes();
     var ss = "0" + date.getSeconds();
 
-    // Return 24hr time in hh:mm:ss format
     return hh + ':' + mm.substr(-2) + ':' + ss.substr(-2); 
 }
 
+/**
+ * Gets Showroom room id from member database.
+ * * Returns a Promise.
+ * 
+ * @param group The group of the member requested (ex: AKB48)
+ * @param short The member identifier, could be memberShort or common
+ *              (ex: yamauchimizuki or zukkii)
+ */
 function getRoomId(group, short)
 {
     var id;
 
     pool.getConnection((err, con) =>
     {
+        if (err)
+        {
+            console.info(err);
+            return -1;
+        }
+
         con.query(`SELECT sr_roomid FROM ` + group + ` WHERE short='` + short + `' OR common='` + short + `'`, function(err, rows)
         {
             if (err) 
@@ -104,6 +147,8 @@ function getRoomId(group, short)
             console.info(`=== DEBUG @ ID Search ===\n> Search Check: ${id}`);
         })
     })
+
+    con.release();
 
     return new Promise(resolve => { setTimeout(() => { resolve(id); }, 2000); })
 }

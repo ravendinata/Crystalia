@@ -6,6 +6,7 @@ module.exports =
 {
     name: 'showroom',
     description: 'Showroom Info command',
+    aliases: ["sr", "sroom"],
     execute(message, args)
     {
         let opt = args[0];
