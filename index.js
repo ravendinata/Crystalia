@@ -1,10 +1,20 @@
 require('dotenv').config();
 
-const Discord = require('discord.js');
 const fs = require('fs');
-const prefix = process.env.prefix;
-const client = new Discord.Client();
+const os = require('os');
+const Discord = require('discord.js');
+const notifier = require('./utils/mailer.js');
 
+const prefix = process.env.prefix;
+
+const serverInfo =
+`\n========================================
+Server Info @ ${os.hostname}:
+========================================
+CPU: ${os.cpus()[0].model} @ ${os.cpus()[0].speed} MHz x ${os.cpus().length} threads
+Sys: ${os.platform} - ver. ${os.version} release ${os.release}`
+
+const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.aliases = new Discord.Collection();
 
@@ -24,9 +34,15 @@ for (const file of commandFiles)
 
 client.once('ready', () => 
 {
+	console.info(serverInfo);
+
 	console.info(`\n========================================`);
 	console.info(`Ready! Logged in as ${client.user.tag}`);
 	console.info(`========================================`);
+
+	if (process.env.server_type != "dev")
+		notifier.sendNotification(`Server Started @ ${os.hostname}!\n ${serverInfo}`);
+
 });
 
 client.on('message', message => 

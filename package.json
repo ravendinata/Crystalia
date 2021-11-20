@@ -13,6 +13,7 @@
     "dotenv": "^10.0.0",
     "eslint": "^7.32.0",
     "mysql": "^2.18.1",
-    "node-fetch": "^2.6.5"
+    "node-fetch": "^2.6.5",
+    "nodemailer": "^6.7.1"
   }
 }
