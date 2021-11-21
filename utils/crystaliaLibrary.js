@@ -145,10 +145,11 @@ function getRoomId(group, short)
             id = data.sr_roomid;
 
             console.info(`=== DEBUG @ ID Search ===\n> Search Check: ${id}`);
+            
+            con.release();
         })
-    })
 
-    con.release();
+    })
 
     return new Promise(resolve => { setTimeout(() => { resolve(id); }, 2000); })
 }

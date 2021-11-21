@@ -33,10 +33,10 @@ module.exports =
                 console.timeEnd(`[PM] Next Live`);
                 break;
 
-            case "stage":
-                console.time(`[PM] Next Live`);
+            case "stage": case "podium": case "ranking": case "stageuser":
+                console.time(`[PM] Stage User`);
                 showroomClient.getStageUserList(message, param, optParam);
-                console.timeEnd(`[PM] Next Live`);
+                console.timeEnd(`[PM] Stage User`);
                 break;
         }
     }
