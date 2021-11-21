@@ -7,20 +7,23 @@ const notifier = require('./utils/mailer.js');
 
 const prefix = process.env.prefix;
 
-const serverInfo =
-`\n========================================
-Server Info @ ${os.hostname}:
-========================================
-CPU: ${os.cpus()[0].model} @ ${os.cpus()[0].speed} MHz x ${os.cpus().length} threads
-Sys: ${os.platform} - ver. ${os.version} release ${os.release}`
-
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.aliases = new Discord.Collection();
 
+const serverInfo =
+`\n========================================
+Server Info @ ${os.hostname} - ${process.env.server_type}:
+========================================
+CPU: ${os.cpus()[0].model} @ ${os.cpus()[0].speed} MHz x ${os.cpus().length} threads
+Sys: ${os.platform} - ver. ${os.version} release ${os.release}`;
+
+// === VAR END === //
+
+// LOAD COMMANDS //
 const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-for (const file of commandFiles) 
+for (const file of commandFiles)
 {
 	const command = require(`./commands/${file}`);
 	client.commands.set(command.name, command);
@@ -32,9 +35,17 @@ for (const file of commandFiles)
 	}
 }
 
+/** ====================
+ * * MAIN OPERATION * * 
+===================== */
+
+client.login(process.env.token);
+
 client.once('ready', () => 
 {
 	console.info(serverInfo);
+
+	printCommands();
 
 	console.info(`\n========================================`);
 	console.info(`Ready! Logged in as ${client.user.tag}`);
@@ -42,7 +53,6 @@ client.once('ready', () =>
 
 	if (process.env.server_type != "dev")
 		notifier.sendNotification(`Server Started @ ${os.hostname}!\n ${serverInfo}`);
-
 });
 
 client.on('message', message => 
@@ -53,6 +63,16 @@ client.on('message', message =>
 	const command = args.shift().toLowerCase();
 
 	if (!client.commands.has(command) && !client.aliases.has(command)) return;
+
+	if (process.env.server_type == "dev" && !message.member.hasPermission('ADMINISTRATOR'))
+	{
+		message.reply(`ERROR! Access Denied! You are trying to access Dev Copy but you are not a Developer!` +
+		`\nBot in this prefix ${prefix} is Dev Build. Only developers can access it.`);	
+
+		console.info(`${message.member.user.tag} attempted to access Dev Build!`);
+
+		return;
+	}
 
 	try
 	{
@@ -71,4 +91,19 @@ client.on('message', message =>
 	}
 });
 
-client.login(process.env.token);
+function printCommands()
+{
+
+	console.info(`\n========================================`);
+	console.info("Commands:");
+	console.info(`========================================`);
+	for (const [key, value] of client.commands)
+		console.info(key);
+
+	console.info(`\n========================================`);
+	console.info("Aliases:");
+	console.info(`========================================`);
+	for (const [key, value] of client.aliases)
+		console.info(key);
+
+}

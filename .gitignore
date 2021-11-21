@@ -1,1 +1,5 @@
+# Environment Variables
 .env
+
+# Folders
+node_modules/

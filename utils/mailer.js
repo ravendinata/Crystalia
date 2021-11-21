@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const Mailer = require('nodemailer');
 
-var transporter = Mailer.createTransport
+var gmailSvc = Mailer.createTransport
 ({
     service: 'gmail',
     auth:
@@ -16,15 +16,15 @@ module.exports =
 {
     sendNotification(mailContent)
     {
-        var mailOptions =
+        var message =
         {
             from: 'skyrin.crystalia@gmail.com',
             to: 'raven.limadinata@outlook.com',
             subject: 'Crystalia Notification (Do Not Reply)',
             text: mailContent
-        }
+        };
 
-        transporter.sendMail(mailOptions, function(err, info)
+        gmailSvc.sendMail(message, function(err, info)
         {
             if (err)
                 console.info(err);
