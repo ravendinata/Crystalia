@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 /* GLOBALS */
 const Discord = require('discord.js');
 const cl = require('../utils/crystaliaLibrary.js');

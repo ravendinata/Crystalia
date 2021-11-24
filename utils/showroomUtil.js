@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const cl = require('../utils/crystaliaLibrary.js')

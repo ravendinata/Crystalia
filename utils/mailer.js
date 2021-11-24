@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const Mailer = require('nodemailer');
 
 var gmailSvc = Mailer.createTransport

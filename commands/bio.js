@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const Discord = require('discord.js');
 const cl = require('../utils/crystaliaLibrary.js');
 const prefix = process.env.prefix;
