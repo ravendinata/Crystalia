@@ -22,7 +22,7 @@ pool.getConnection((err, con) =>
         return -1;
     }
 
-    con.query(`SELECT COUNT(id) AS items FROM trivia`, function (err, rows)
+    con.query(`SELECT COUNT(id) AS items FROM trivia;`, function (err, rows)
     {
         if (err)
         {
@@ -54,7 +54,7 @@ module.exports =
 
             pool.getConnection((err, con) =>
             {
-                con.query(`SELECT * FROM trivia WHERE id=` + id, function(err, rows)
+                con.query(`SELECT * FROM trivia WHERE id=?;`, id, function(err, rows)
                 {
                     if (err || rows[0] == undefined)
                     {
@@ -72,7 +72,7 @@ module.exports =
         {
             pool.getConnection((err, con) => 
             {
-                con.query(`SELECT * FROM trivia WHERE groupName='` + args[0] + `' OR memberNick='` + args[0] + `' OR memberShort ='` + args[0] + `'`, function (err, rows)
+                con.query(`SELECT * FROM trivia WHERE groupName=? OR memberNick=? OR memberShort=?;`, [args[0], args[0], args[0]], function (err, rows)
                 {
                     if (err)
                     {

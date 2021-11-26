@@ -123,7 +123,7 @@ function getRoomId(group, short)
             return -1;
         }
 
-        con.query(`SELECT sr_roomid FROM ` + group + ` WHERE short='` + short + `' OR common='` + short + `'`, function(err, rows)
+        con.query(`SELECT sr_roomid FROM ${group} WHERE short=? OR common=?;`, [short, short], function(err, rows)
         {
             if (err) 
             {

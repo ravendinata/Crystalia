@@ -51,7 +51,7 @@ module.exports =
         {
             color = cl.getGroupColour(args[0]);
 
-            con.query(`SELECT * FROM ` + args[0] + ` WHERE short='` + args[1] + `' OR common='` + args[1] + `'`, function (err, rows)
+            con.query(`SELECT * FROM ${args[0]} WHERE short=? OR common=?;`, [args[1], args[1]], function (err, rows)
             {
                 if (err) 
                 {

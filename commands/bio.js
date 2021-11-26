@@ -57,13 +57,13 @@ module.exports =
         {
             color = cl.getGroupColour(args[0]);
 
-            con.query(`SELECT * FROM ` + args[0] + ` WHERE short='` + args[1] + `' OR common='` + args[1] + `'`, function (err, rows)
+            con.query(`SELECT * FROM ${args[0]} WHERE short=? OR common=?;`, [args[1], args[1]], function (err, rows)
             {
                 if (err) 
                 {
                     message.channel.send(`Argument Error: Cannot find specified group ${args[0].toUpperCase()}!`);
                     message.channel.send(`Only Japan groups (AKB48, HKT48, NGT48, NMB48, SKE48, STU48) are available at the moment.`);
-                    return;
+                    return console.info(err);
                 }
 
                 if (rows[0] == undefined)
