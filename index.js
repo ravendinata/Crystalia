@@ -11,13 +11,6 @@ const client = new Discord.Client();
 client.commands = new Discord.Collection();
 client.aliases = new Discord.Collection();
 
-const serverInfo =
-`\n========================================
-Server Info @ ${os.hostname} - ${process.env.server_type}:
-========================================
-CPU: ${os.cpus()[0].model} @ ${os.cpus()[0].speed} MHz x ${os.cpus().length} threads
-Sys: ${os.platform} - ver. ${os.version} release ${os.release}`;
-
 // === VAR END === //
 
 // LOAD COMMANDS //
@@ -43,8 +36,6 @@ client.login(process.env.token);
 
 client.once('ready', () => 
 {
-	console.info(serverInfo);
-
 	printCommands();
 
 	console.info(`\n========================================`);
@@ -93,7 +84,6 @@ client.on('message', message =>
 
 function printCommands()
 {
-
 	console.info(`\n========================================`);
 	console.info("Commands:");
 	console.info(`========================================`);
@@ -105,5 +95,4 @@ function printCommands()
 	console.info(`========================================`);
 	for (const [key, value] of client.aliases)
 		console.info(key);
-
 }
