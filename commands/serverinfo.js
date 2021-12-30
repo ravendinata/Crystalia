@@ -1,19 +1,5 @@
-const os = require('os');
-const ps = require('process');
-
 const Discord = require('discord.js');
-
-/* GLOBALS */
-
-const serverInfo =
-`\n========================================
-Server Info @ ${os.hostname} - ${process.env.server_type}:
-========================================
-CPU: ${os.cpus()[0].model} @ ${os.cpus()[0].speed} MHz x ${os.cpus().length} threads
-Sys: ${os.platform} - ver. ${os.version} release ${os.release}git 
-Mem: ${Math.floor(ps.memoryUsage.rss() / 1000000)} MB [Used] / ${Math.floor(os.totalmem / 1000000)} MB [Total]`;
-
-// === VAR END === //
+const ServerInfo = require('../utils/sysHelper');
 
 console.info("Server Info Module Initialized!");
 
@@ -26,7 +12,16 @@ module.exports =
     {
         const embed = new Discord.MessageEmbed();
 
-        embed.setColor("000000").setDescription(serverInfo);
+        switch(args[0])
+        {
+            default: case "platform":
+                embed.setColor("000000").setDescription(ServerInfo.serverInfo());
+                break;
+            
+            case "resusage": case "resourceusage":
+                embed.setColor("000000").setDescription(ServerInfo.resourceUsageReport());
+                break;
+        }
 
         return message.channel.send(embed);
     }
