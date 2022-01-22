@@ -15,13 +15,13 @@ module.exports =
 
         switch(opt)
         {
-            default: case "onlive": case "streaming":
+            default: case "onlive": case "streaming": case "live":
                 console.time(`[PM] On Live`);
                 showroomClient.getOnlive(message, param);
                 console.timeEnd(`[PM] On Live`);
                 break;
 
-            case "roominfo": case "info":
+            case "roominfo": case "room": case "info":
                 console.time(`[PM] Room Info`);
                 showroomClient.getRoomInfo(message, param, optParam);
                 console.timeEnd(`[PM] Room Info`);
