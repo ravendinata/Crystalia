@@ -262,6 +262,47 @@ async function getStageUserList(message, group, short, n = 13)
     })
 }
 
+async function count(message, param)
+{
+    fetch(BASE_ONLIVE_API_URL, METHOD_GET)
+    .then(res => res.json())
+    .then((json) =>
+    {
+        var data = json.onlives[0].lives;
+        var r1 = data.filter(function(x)
+        { return x.room_url_key.startsWith("akb48_"); })
+        var r2 = data.filter(function(x)
+        { return x.room_url_key.startsWith("48_"); })
+
+        var result = r1.concat(r2);
+
+        if (param != undefined)
+        {
+            var q1 = result.filter(function(x)
+            { return x.room_url_key.toLowerCase().includes(param); })
+
+            var q2 = result.filter(function(x)
+            { return x.main_name.toLowerCase().includes(param); })
+
+            result = q1.concat(q2);
+            var set = new Set(result);
+            result = Array.from(set);
+        }
+
+        const liveCount = result.length;
+        let embed = new Discord.MessageEmbed().setColor("ffffff");
+                        
+        if (param == undefined)
+            embed.setDescription(`${liveCount} members are streaming now`);
+        else
+            embed.setDescription(`${liveCount} members with keyword '${param}' are streaming now`);
+
+        console.info(`> ${liveCount} Members Streaming | Success!`);
+
+        return message.channel.send(embed);
+    })
+}
+
 
 /** ====================
  * * MODULE EXPORTS * * 
@@ -269,6 +310,7 @@ async function getStageUserList(message, group, short, n = 13)
 
 module.exports =
 {
+    count,
     getOnlive,
     getRoomInfo,
     getNextLive,

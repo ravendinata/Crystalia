@@ -38,6 +38,12 @@ module.exports =
                 showroomClient.getStageUserList(message, param, optParam);
                 console.timeEnd(`[PM] Stage User`);
                 break;
+
+            case "count":
+                console.time(`[PM] Stage User`);
+                showroomClient.count(message, param);
+                console.timeEnd(`[PM] Stage User`);
+                break;
         }
     }
 }
