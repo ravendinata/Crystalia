@@ -16,6 +16,31 @@ var pool = mysql.createPool({
     database: process.env.db_name
 });
 
+// ========== Waiter Class ========== //
+class Waiter
+{
+    constructor(message) { this.message = message; }
+
+    async send(content = "Please wait...")
+    {
+        this.ref = await this.message.channel.send(new Discord.MessageEmbed()
+                                                   .setDescription(content)
+                                                   .setColor("ffffff"));
+    }
+
+    async delete() 
+    { 
+        try { return await this.ref.delete(); }
+        catch (error) 
+        { 
+            console.info(error); 
+            this.message.channel.send(new Discord.MessageEmbed()
+                                      .setDescription("Sorry... We have encountered an error!")
+                                      .setColor("ff0000"));
+        }
+    }
+}
+
 // ========== Randomizer Functions ========== //
 
 /**
@@ -152,16 +177,17 @@ function getRoomId(group, short)
     return new Promise(resolve => { setTimeout(() => { resolve(id); }, 2000); })
 }
 
-
 /** ====================
  * * MODULE EXPORTS * * 
 ===================== */
 
 module.exports =
 {
+    Waiter: Waiter, // Waiter class
+
     randomInteger,
     getGroupColour,
     selectRandomAndCompare,
     convertEpochTo24hr,
-    getRoomId
+    getRoomId,
 }

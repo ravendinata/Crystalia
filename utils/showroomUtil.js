@@ -29,8 +29,11 @@ function getUrlKey(url) { return url.replace(BASE_URL + '/', ''); }
  * @param param     Search parameters (Can take any filter).
  *                  Doesn't need to be [groupName] [memberShort/memberCommon]
  */
-function getOnlive(message, param)
+async function getOnlive(message, param)
 {
+    let waiter = new cl.Waiter(message);
+    await waiter.send(`Fetching onlive member list. Please wait...`);
+
     fetch(BASE_ONLIVE_API_URL, METHOD_GET)
     .then(res => res.json())
     .then((json) =>
@@ -112,6 +115,7 @@ function getOnlive(message, param)
 
         console.info(`> ${liveCount} Members Streaming | Success!`);
 
+        waiter.delete();
         return message.channel.send(embed);
     })
 }
@@ -138,6 +142,9 @@ async function getRoomInfo(message, group, short)
 
     if (room_id == undefined || room_id == -1)
         return message.channel.send("Sorry but we cannot find that room!");
+
+    let waiter = new cl.Waiter(message);
+    await waiter.send(`Fetching room information for ${group} ${short}...`);
 
     fetch(BASE_API_URL + endpoint, METHOD_GET)
     .then(res => res.json())
@@ -171,6 +178,7 @@ async function getRoomInfo(message, group, short)
         )
         .setImage(json.image)
 
+        waiter.delete();
         return message.channel.send(embed);
     })
 }
@@ -198,6 +206,9 @@ async function getNextLive(message, group, short)
     if (room_id == undefined || room_id == -1)
         return message.channel.send("Sorry but we cannot find that room!");
 
+    let waiter = new cl.Waiter(message);
+    await waiter.send(`Fetching next scheduled live for ${group} ${short}...`);
+
     fetch(BASE_API_URL + endpoint, METHOD_GET)
     .then(res => res.json())
     .then(json => 
@@ -207,6 +218,7 @@ async function getNextLive(message, group, short)
         .setTitle(`Next Scheduled Live`)
         .addField("Date/Time:", json.text)
 
+        waiter.delete();
         return message.channel.send(embed);
     })
 }
@@ -238,6 +250,9 @@ async function getStageUserList(message, group, short, n = 13)
     if (room_id == undefined || room_id == -1)
         return message.channel.send("Sorry but we cannot find that room!");
 
+    let waiter = new cl.Waiter(message);
+    await waiter.send("Fetching stage user list...");
+
     fetch(BASE_API_URL + endpoint, METHOD_GET)
     .then(res => res.json())
     .then(json => 
@@ -247,6 +262,7 @@ async function getStageUserList(message, group, short, n = 13)
         if (data[0] == null)
         {
             console.info("> Abort! [Reason: Array Empty! User offline...]");
+            waiter.delete();
             return message.channel.send("This member is not currently live streaming.\nPlease check again while member is live streaming.");
         }
 
@@ -258,12 +274,16 @@ async function getStageUserList(message, group, short, n = 13)
         for (let i = 0; i < n; i++)
             embed.addField(`Rank ${i+1}`, data[i].user.name);
 
+        waiter.delete();
         return message.channel.send(embed);
     })
 }
 
 async function count(message, param)
 {
+    let waiter = new cl.Waiter(message);
+    await waiter.send("Counting number of members currently streaming...");
+
     fetch(BASE_ONLIVE_API_URL, METHOD_GET)
     .then(res => res.json())
     .then((json) =>
@@ -299,6 +319,7 @@ async function count(message, param)
 
         console.info(`> ${liveCount} Members Streaming | Success!`);
 
+        waiter.delete();       
         return message.channel.send(embed);
     })
 }
