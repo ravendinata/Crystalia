@@ -23,16 +23,22 @@ class Waiter
 
     async send(content = "Please wait...")
     {
-        this.ref = await this.message.channel.send
-                    (
-                        new Discord.MessageEmbed()
-                        .setDescription(content)
-                         .setColor("ffffff")
-                    );
-
+        this.ref = await this.message.channel.send(new Discord.MessageEmbed()
+                                                   .setDescription(content)
+                                                   .setColor("ffffff"));
     }
 
-    async delete() { return await this.ref.delete(); }
+    async delete() 
+    { 
+        try { return await this.ref.delete(); }
+        catch (error) 
+        { 
+            console.info(error); 
+            this.message.channel.send(new Discord.MessageEmbed()
+                                      .setDescription("Sorry... We have encountered an error!")
+                                      .setColor("ff0000"));
+        }
+    }
 }
 
 // ========== Randomizer Functions ========== //
