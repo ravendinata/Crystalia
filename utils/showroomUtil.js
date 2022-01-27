@@ -156,6 +156,7 @@ async function getRoomInfo(message, group, short)
     var json = await getAPI(BASE_API_URL + endpoint);
     var isLive;
     var currStreamStart = cl.convertEpochTo24hr(json.current_live_started_at);
+    var currStreamViewer = json.view_num;
 
     console.log(`> Fetch Check: ${json.main_name}`);
 
@@ -165,6 +166,7 @@ async function getRoomInfo(message, group, short)
     {
         isLive = "Not Streaming [Offline]";
         currStreamStart = isLive;
+        currStreamViewer = isLive;
     }
 
     const embed = new Discord.MessageEmbed()
@@ -177,7 +179,7 @@ async function getRoomInfo(message, group, short)
         { name: 'Follower', value: json.follower_num },
         { name: 'Streaming Now', value: isLive },
         { name: 'Current Stream Start Time', value: currStreamStart },
-        { name: 'Current Viewer', value: json.view_num },
+        { name: 'Current Stream Viewer Count', value: currStreamViewer },
         { name: 'Room Description', value: json.description }
     )
     .setImage(json.image)
