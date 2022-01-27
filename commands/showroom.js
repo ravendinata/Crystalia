@@ -44,6 +44,12 @@ module.exports =
                 showroomClient.count(message, param);
                 console.timeEnd(`[PM] Stage User`);
                 break;
+
+            case "liverank":
+                console.time(`[PM] Stage User`);
+                showroomClient.getLiveRanking(message, param);
+                console.timeEnd(`[PM] Stage User`);
+                break;
         }
     }
 }

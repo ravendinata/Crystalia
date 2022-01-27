@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const cl = require('../utils/crystaliaLibrary.js')
+const { JSDOM } = require('jsdom');
 
 const prefix = process.env.prefix;
 
@@ -279,6 +280,48 @@ async function getStageUserList(message, group, short, n = 13)
     })
 }
 
+async function getLiveRanking(message, key, n = 13)
+{
+    // var key = url_key;
+
+    /* if (!isNaN(url_key))
+        key = await roomIDtoURLKey(url_key); */
+
+    console.info(`\n=== DEBUG @ API Fetch ===\n> URL Key: ${key}`);
+
+    var dom;
+    try
+    {
+        dom = await JSDOM.fromURL(`https://www.showroom-live.com/${key}`, 
+                                  { resources:"usable", runScripts: "dangerously" })
+    } 
+    catch(ex) {}
+
+    const node = dom.window.document.getElementById('js-live-data');
+    const json = JSON.parse(node.getAttribute("data-json"));
+    const ranking = json.ranking.live_ranking;
+    dom.window.close();
+
+    if (ranking[0] == null)
+    {
+        console.info(`\nERROR! Room is not currently streaming! Please try again later...\n`);
+        return;
+    }
+
+    const embed = new Discord.MessageEmbed()
+    .setColor("#ffffff")
+    .setTitle(`Live Ranking as of ${cl.convertEpochTo24hr(ranking[0].updated_at)}`)
+    .setImage(ranking[0].user.avatar_url)
+
+    for (let i = 0; i < n; i++)
+    {
+        embed.addField(`Rank ${i+1}`, 
+                       `${ranking[i].user.name}\nPoints: ${ranking[i].point}`);
+    }
+
+    return message.channel.send(embed);
+}
+
 async function count(message, param)
 {
     let waiter = new cl.Waiter(message);
@@ -335,5 +378,6 @@ module.exports =
     getOnlive,
     getRoomInfo,
     getNextLive,
-    getStageUserList
+    getStageUserList,
+    getLiveRanking
 }
