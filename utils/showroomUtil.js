@@ -69,6 +69,7 @@ async function getOnlive(message, param)
             else
                 embed.setTitle(`:satellite:  No Members with Keyword '${param}' is Currently Streaming`);
 
+            waiter.delete();
             return message.channel.send(embed);
         }
         else
