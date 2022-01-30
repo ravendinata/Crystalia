@@ -30,6 +30,18 @@ async function getAPI(url)
     EXPORTED FUNCTIONS
 ======================= */
 
+async function roomIDtoURLKey(room_id)
+{
+    const result = await getAPI(`https://www.showroom-live.com/api/room/profile?room_id=${room_id}`);
+    return await result.room_url_key;
+}
+
+async function urlKeyToRoomID(url_key)
+{
+    const result = await getAPI(`https://www.showroom-live.com/api/room/status?room_url_key=${url_key}`);
+    return await result.room_id;
+}
+
 /**
  *
  * Get a list of members onlive/streaming,
@@ -277,14 +289,15 @@ async function getStageUserList(message, group, short, n = 13)
     return message.channel.send(embed);
 }
 
-async function getLiveRanking(message, key, n = 13)
+async function getLiveRanking(message, group, short, n = 13)
 {
-    // var key = url_key;
-
-    /* if (!isNaN(url_key))
-        key = await roomIDtoURLKey(url_key); */
+    const room_id = await cl.getRoomId(group, short);
+    const key = await roomIDtoURLKey(room_id);
 
     console.info(`\n=== DEBUG @ API Fetch ===\n> URL Key: ${key}`);
+
+    let waiter = new cl.Waiter(message);
+    await waiter.send("Fetching live ranking...");
 
     var dom;
     try
@@ -292,7 +305,7 @@ async function getLiveRanking(message, key, n = 13)
         dom = await JSDOM.fromURL(`https://www.showroom-live.com/${key}`, 
                                   { resources:"usable", runScripts: "dangerously" })
     } 
-    catch(ex) {}
+    catch(ex) { waiter.delete(); }
 
     const node = dom.window.document.getElementById('js-live-data');
     const json = JSON.parse(node.getAttribute("data-json"));
@@ -301,8 +314,9 @@ async function getLiveRanking(message, key, n = 13)
 
     if (ranking[0] == null)
     {
-        console.info(`\nERROR! Room is not currently streaming! Please try again later...\n`);
-        return;
+        console.info("> Abort! [Reason: User offline...]");
+        waiter.delete();
+        return message.channel.send("This member is not currently live streaming.\nPlease check again while member is live streaming.");
     }
 
     const embed = new Discord.MessageEmbed()
@@ -316,6 +330,7 @@ async function getLiveRanking(message, key, n = 13)
                        `${ranking[i].user.name}\nPoints: ${ranking[i].point}`);
     }
 
+    waiter.delete();
     return message.channel.send(embed);
 }
 
