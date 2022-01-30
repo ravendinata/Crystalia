@@ -3,6 +3,7 @@ require('dotenv').config();
 const fs = require('fs');
 const os = require('os');
 const Discord = require('discord.js');
+const ServerInfo = require('./utils/sysHelper');
 const notifier = require('./utils/mailer.js');
 
 const prefix = process.env.prefix;
@@ -43,7 +44,7 @@ client.once('ready', () =>
 	console.info(`========================================`);
 
 	if (process.env.server_type != "dev")
-		notifier.sendNotification(`Server Started @ ${os.hostname}!\n ${serverInfo}`);
+		notifier.sendNotification(`Server Started @ ${os.hostname}!\n${ServerInfo.serverInfo()}`);
 });
 
 client.on('message', message => 

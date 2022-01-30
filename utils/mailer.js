@@ -2,7 +2,7 @@ const Mailer = require('nodemailer');
 
 var gmailSvc = Mailer.createTransport
 ({
-    service: 'gmail',
+    service: 'hotmail',
     auth:
     {
         user: process.env.mail_user,
@@ -16,7 +16,7 @@ module.exports =
     {
         var message =
         {
-            from: 'skyrin.crystalia@gmail.com',
+            from: 'skyrin.crystalia@outlook.com',
             to: 'raven.limadinata@outlook.com',
             subject: 'Crystalia Notification (Do Not Reply)',
             text: mailContent

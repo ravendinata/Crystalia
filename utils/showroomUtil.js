@@ -16,6 +16,16 @@ const BASE_ONLIVE_API_URL = "https://www.showroom-live.com/api/live/onlives";
 /* Breaks down raw URL into only URL key */
 function getUrlKey(url) { return url.replace(BASE_URL + '/', ''); }
 
+/** 
+ * Fetches API data from the assigned url
+ * @param url The URL from which the API should be fetched
+ */
+async function getAPI(url)
+{
+    const response = await fetch(url, METHOD_GET);
+    return await response.json();
+}
+
 /* =======================
     EXPORTED FUNCTIONS
 ======================= */
@@ -35,90 +45,87 @@ async function getOnlive(message, param)
     let waiter = new cl.Waiter(message);
     await waiter.send(`Fetching onlive member list. Please wait...`);
 
-    fetch(BASE_ONLIVE_API_URL, METHOD_GET)
-    .then(res => res.json())
-    .then((json) =>
+    var json = await getAPI(BASE_ONLIVE_API_URL);
+    var data = json.onlives[0].lives;
+    var r1 = data.filter(function(x)
+    { return x.room_url_key.startsWith("akb48_"); })
+    var r2 = data.filter(function(x)
+    { return x.room_url_key.startsWith("48_"); })
+
+    var result = r1.concat(r2);
+
+    if (param != undefined)
     {
-        var data = json.onlives[0].lives;
-        var r1 = data.filter(function(x)
-        { return x.room_url_key.startsWith("akb48_"); })
-        var r2 = data.filter(function(x)
-        { return x.room_url_key.startsWith("48_"); })
+        var q1 = result.filter(function(x)
+        { return x.room_url_key.toLowerCase().includes(param); })
 
-        var result = r1.concat(r2);
+        var q2 = result.filter(function(x)
+        { return x.main_name.toLowerCase().includes(param); })
 
-        if (param != undefined)
-        {
-            var q1 = result.filter(function(x)
-            { return x.room_url_key.toLowerCase().includes(param); })
+        result = q1.concat(q2);
+        var set = new Set(result);
+        result = Array.from(set);
+    }
 
-            var q2 = result.filter(function(x)
-            { return x.main_name.toLowerCase().includes(param); })
+    const liveCount = result.length;
+    let embed = new Discord.MessageEmbed().setColor("ffffff");
 
-            result = q1.concat(q2);
-            var set = new Set(result);
-            result = Array.from(set);
-        }
-
-        const liveCount = result.length;
-        let embed = new Discord.MessageEmbed().setColor("ffffff");
-
-        if (liveCount <= 0)
-        {
-            if (param == undefined)
-                embed.setTitle(`:satellite:  No Members Currently Streaming`);
-            else
-                embed.setTitle(`:satellite:  No Members with Keyword '${param}' is Currently Streaming`);
-
-            return message.channel.send(embed);
-        }
+    if (liveCount <= 0)
+    {
+        if (param == undefined)
+            embed.setTitle(`:satellite:  No Members Currently Streaming`);
         else
-        {
-            if (param == undefined)
-                embed.setTitle(`:satellite:  Members Currently Streaming | Page 1`)
-                     .setFooter(`Members/Rooms Streaming: ${liveCount}`);
-            else
-                embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page 1`)
-                     .setFooter(`'${param}' search results: ${liveCount}`)
-        }
-
-        for (let string, title, page = 1, names = 0; names < liveCount; names++)
-        {
-            string = `https://www.showroom-live.com/${result[names].room_url_key}`;
-            title = result[names].main_name;
-
-            if (result[names].label != undefined)
-                title = title + `|  ${result[names].label}`;
-            
-            if (result[names].telop != undefined)
-                string = string + `\nTelop: ${result[names].telop}`;
-
-            embed.addField(title, `${string}\n\u200B`);
-
-            if (names % 20 == 9 && names != liveCount-1)
-                embed.addField('\u200B\n::: Break :::', '\u200B');
-
-            if (names % 20 == 19 && names >= 19 && names != liveCount-1)
-            {
-                message.channel.send(embed)
-                embed = new Discord.MessageEmbed().setColor("ffffff");
-                
-                ++page;
-
-                if (param == undefined)
-                    embed.setTitle(`:satellite:  Members Currently Streaming | Page ${page}`)
-                         .setFooter(`Members/Rooms Streaming: ${liveCount}`);
-                else
-                    embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page ${page}`)
-                         .setFooter(`'${param}' search results: ${liveCount}`)
-            }
-        }
-
-        console.info(`> ${liveCount} Members Streaming | Success!`);
+            embed.setTitle(`:satellite:  No Members with Keyword '${param}' is Currently Streaming`);
 
         waiter.delete();
         return message.channel.send(embed);
-    })
+    }
+    else
+    {
+        if (param == undefined)
+            embed.setTitle(`:satellite:  Members Currently Streaming | Page 1`)
+                    .setFooter(`Members/Rooms Streaming: ${liveCount}`);
+        else
+            embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page 1`)
+                    .setFooter(`'${param}' search results: ${liveCount}`)
+    }
+
+    for (let string, title, page = 1, names = 0; names < liveCount; names++)
+    {
+        string = `https://www.showroom-live.com/${result[names].room_url_key}`;
+        title = result[names].main_name;
+
+        if (result[names].label != undefined)
+            title = title + `|  ${result[names].label}`;
+        
+        if (result[names].telop != undefined)
+            string = string + `\nTelop: ${result[names].telop}`;
+
+        embed.addField(title, `${string}\n\u200B`);
+
+        if (names % 20 == 9 && names != liveCount-1)
+            embed.addField('\u200B\n::: Break :::', '\u200B');
+
+        if (names % 20 == 19 && names >= 19 && names != liveCount-1)
+        {
+            message.channel.send(embed)
+            embed = new Discord.MessageEmbed().setColor("ffffff");
+            
+            ++page;
+
+            if (param == undefined)
+                embed.setTitle(`:satellite:  Members Currently Streaming | Page ${page}`)
+                        .setFooter(`Members/Rooms Streaming: ${liveCount}`);
+            else
+                embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page ${page}`)
+                        .setFooter(`'${param}' search results: ${liveCount}`)
+        }
+    }
+
+    console.info(`> ${liveCount} Members Streaming | Success!`);
+
+    waiter.delete();
+    return message.channel.send(embed);
 }
 
 /**
@@ -147,41 +154,39 @@ async function getRoomInfo(message, group, short)
     let waiter = new cl.Waiter(message);
     await waiter.send(`Fetching room information for ${group} ${short}...`);
 
-    fetch(BASE_API_URL + endpoint, METHOD_GET)
-    .then(res => res.json())
-    .then(json => 
+    var json = await getAPI(BASE_API_URL + endpoint);
+    var isLive;
+    var currStreamStart = cl.convertEpochTo24hr(json.current_live_started_at);
+    var currStreamViewer = json.view_num;
+
+    console.log(`> Fetch Check: ${json.main_name}`);
+
+    if (json.is_onlive == true)
+        isLive = "Yes [Online]";
+    else
     {
-        var isLive;
-        var currStreamStart = cl.convertEpochTo24hr(json.current_live_started_at);
+        isLive = "Not Streaming [Offline]";
+        currStreamStart = isLive;
+        currStreamViewer = isLive;
+    }
 
-        console.log(`> Fetch Check: ${json.main_name}`);
+    const embed = new Discord.MessageEmbed()
+    .setColor(cl.getGroupColour(group))
+    .setTitle(`${json.main_name} Room Info`)
+    .addFields(
+        { name: 'Room Name', value: json.main_name },
+        { name: 'Room Level', value: json.room_level },
+        { name: 'Room ID', value: json.room_id },
+        { name: 'Follower', value: json.follower_num },
+        { name: 'Streaming Now', value: isLive },
+        { name: 'Current Stream Start Time', value: currStreamStart },
+        { name: 'Current Stream Viewer Count', value: currStreamViewer },
+        { name: 'Room Description', value: json.description }
+    )
+    .setImage(json.image)
 
-        if (json.is_onlive == true)
-            isLive = "Yes [Online]";
-        else
-        {
-            isLive = "Not Streaming [Offline]";
-            currStreamStart = isLive;
-        }
-
-        const embed = new Discord.MessageEmbed()
-        .setColor(cl.getGroupColour(group))
-        .setTitle(`${json.main_name} Room Info`)
-        .addFields(
-            { name: 'Room Name', value: json.main_name },
-            { name: 'Room Level', value: json.room_level },
-            { name: 'Room ID', value: json.room_id },
-            { name: 'Follower', value: json.follower_num },
-            { name: 'Streaming Now', value: isLive },
-            { name: 'Current Stream Start Time', value: currStreamStart },
-            { name: 'Current Viewer', value: json.view_num },
-            { name: 'Room Description', value: json.description }
-        )
-        .setImage(json.image)
-
-        waiter.delete();
-        return message.channel.send(embed);
-    })
+    waiter.delete();
+    return message.channel.send(embed);
 }
 
 /**
@@ -210,18 +215,14 @@ async function getNextLive(message, group, short)
     let waiter = new cl.Waiter(message);
     await waiter.send(`Fetching next scheduled live for ${group} ${short}...`);
 
-    fetch(BASE_API_URL + endpoint, METHOD_GET)
-    .then(res => res.json())
-    .then(json => 
-    {
-        const embed = new Discord.MessageEmbed()
-        .setColor(cl.getGroupColour(group))
-        .setTitle(`Next Scheduled Live`)
-        .addField("Date/Time:", json.text)
+    var json = await getAPI(BASE_API_URL + endpoint);
+    const embed = new Discord.MessageEmbed()
+    .setColor(cl.getGroupColour(group))
+    .setTitle(`Next Scheduled Live`)
+    .addField("Date/Time:", json.text)
 
-        waiter.delete();
-        return message.channel.send(embed);
-    })
+    waiter.delete();
+    return message.channel.send(embed);
 }
 
 /**
@@ -254,30 +255,26 @@ async function getStageUserList(message, group, short, n = 13)
     let waiter = new cl.Waiter(message);
     await waiter.send("Fetching stage user list...");
 
-    fetch(BASE_API_URL + endpoint, METHOD_GET)
-    .then(res => res.json())
-    .then(json => 
+    var json = await getAPI(BASE_API_URL + endpoint);
+    const data = json.stage_user_list;
+
+    if (data[0] == null)
     {
-        const data = json.stage_user_list;
-
-        if (data[0] == null)
-        {
-            console.info("> Abort! [Reason: Array Empty! User offline...]");
-            waiter.delete();
-            return message.channel.send("This member is not currently live streaming.\nPlease check again while member is live streaming.");
-        }
-
-        const embed = new Discord.MessageEmbed()
-        .setColor("#ffffff")
-        .setTitle(`Next Scheduled Live`)
-        .setImage(data[0].user.avatar_url)
-
-        for (let i = 0; i < n; i++)
-            embed.addField(`Rank ${i+1}`, data[i].user.name);
-
+        console.info("> Abort! [Reason: Array Empty! User offline...]");
         waiter.delete();
-        return message.channel.send(embed);
-    })
+        return message.channel.send("This member is not currently live streaming.\nPlease check again while member is live streaming.");
+    }
+
+    const embed = new Discord.MessageEmbed()
+    .setColor("#ffffff")
+    .setTitle(`Next Scheduled Live`)
+    .setImage(data[0].user.avatar_url)
+
+    for (let i = 0; i < n; i++)
+        embed.addField(`Rank ${i+1}`, data[i].user.name);
+
+    waiter.delete();
+    return message.channel.send(embed);
 }
 
 async function getLiveRanking(message, key, n = 13)
@@ -327,44 +324,40 @@ async function count(message, param)
     let waiter = new cl.Waiter(message);
     await waiter.send("Counting number of members currently streaming...");
 
-    fetch(BASE_ONLIVE_API_URL, METHOD_GET)
-    .then(res => res.json())
-    .then((json) =>
+    var json = await getAPI(BASE_ONLIVE_API_URL);
+    var data = json.onlives[0].lives;
+    var r1 = data.filter(function(x)
+    { return x.room_url_key.startsWith("akb48_"); })
+    var r2 = data.filter(function(x)
+    { return x.room_url_key.startsWith("48_"); })
+
+    var result = r1.concat(r2);
+
+    if (param != undefined)
     {
-        var data = json.onlives[0].lives;
-        var r1 = data.filter(function(x)
-        { return x.room_url_key.startsWith("akb48_"); })
-        var r2 = data.filter(function(x)
-        { return x.room_url_key.startsWith("48_"); })
+        var q1 = result.filter(function(x)
+        { return x.room_url_key.toLowerCase().includes(param); })
 
-        var result = r1.concat(r2);
+        var q2 = result.filter(function(x)
+        { return x.main_name.toLowerCase().includes(param); })
 
-        if (param != undefined)
-        {
-            var q1 = result.filter(function(x)
-            { return x.room_url_key.toLowerCase().includes(param); })
+        result = q1.concat(q2);
+        var set = new Set(result);
+        result = Array.from(set);
+    }
 
-            var q2 = result.filter(function(x)
-            { return x.main_name.toLowerCase().includes(param); })
+    const liveCount = result.length;
+    let embed = new Discord.MessageEmbed().setColor("ffffff");
+                    
+    if (param == undefined)
+        embed.setDescription(`${liveCount} members are streaming now`);
+    else
+        embed.setDescription(`${liveCount} members with keyword '${param}' are streaming now`);
 
-            result = q1.concat(q2);
-            var set = new Set(result);
-            result = Array.from(set);
-        }
+    console.info(`> ${liveCount} Members Streaming | Success!`);
 
-        const liveCount = result.length;
-        let embed = new Discord.MessageEmbed().setColor("ffffff");
-                        
-        if (param == undefined)
-            embed.setDescription(`${liveCount} members are streaming now`);
-        else
-            embed.setDescription(`${liveCount} members with keyword '${param}' are streaming now`);
-
-        console.info(`> ${liveCount} Members Streaming | Success!`);
-
-        waiter.delete();       
-        return message.channel.send(embed);
-    })
+    waiter.delete();       
+    return message.channel.send(embed);
 }
 
 
