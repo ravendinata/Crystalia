@@ -33,13 +33,14 @@ module.exports =
                 console.timeEnd(`[PM] Next Live`);
                 break;
 
-            case "stage": case "podium": case "ranking": case "stageuser": case "liverank":
+            case "stage": case "podium": case "ranking": case "stageuser": 
+            case "liverank": case "rank":
                 console.time(`[PM] Stage User`);
                 showroomClient.getLiveRanking(message, param, optParam);
                 console.timeEnd(`[PM] Stage User`);
                 break;
 
-            case "count":
+            case "count": case "num": case "number":
                 console.time(`[PM] Count`);
                 showroomClient.count(message, param);
                 console.timeEnd(`[PM] Count`);
