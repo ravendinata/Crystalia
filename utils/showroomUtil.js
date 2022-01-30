@@ -1,6 +1,7 @@
 const Discord = require('discord.js');
 const fetch = require('node-fetch');
 const cl = require('../utils/crystaliaLibrary.js')
+const { JSDOM } = require('jsdom');
 
 const prefix = process.env.prefix;
 
@@ -28,6 +29,18 @@ async function getAPI(url)
 /* =======================
     EXPORTED FUNCTIONS
 ======================= */
+
+async function roomIDtoURLKey(room_id)
+{
+    const result = await getAPI(`https://www.showroom-live.com/api/room/profile?room_id=${room_id}`);
+    return await result.room_url_key;
+}
+
+async function urlKeyToRoomID(url_key)
+{
+    const result = await getAPI(`https://www.showroom-live.com/api/room/status?room_url_key=${url_key}`);
+    return await result.room_id;
+}
 
 /**
  *
@@ -276,6 +289,51 @@ async function getStageUserList(message, group, short, n = 13)
     return message.channel.send(embed);
 }
 
+async function getLiveRanking(message, group, short, n = 13)
+{
+    const room_id = await cl.getRoomId(group, short);
+    const key = await roomIDtoURLKey(room_id);
+
+    console.info(`\n=== DEBUG @ API Fetch ===\n> URL Key: ${key}`);
+
+    let waiter = new cl.Waiter(message);
+    await waiter.send("Fetching live ranking...");
+
+    var dom;
+    try
+    {
+        dom = await JSDOM.fromURL(`https://www.showroom-live.com/${key}`, 
+                                  { resources:"usable", runScripts: "dangerously" })
+    } 
+    catch(ex) { waiter.delete(); }
+
+    const node = dom.window.document.getElementById('js-live-data');
+    const json = JSON.parse(node.getAttribute("data-json"));
+    const ranking = json.ranking.live_ranking;
+    dom.window.close();
+
+    if (ranking[0] == null)
+    {
+        console.info("> Abort! [Reason: User offline...]");
+        waiter.delete();
+        return message.channel.send("This member is not currently live streaming.\nPlease check again while member is live streaming.");
+    }
+
+    const embed = new Discord.MessageEmbed()
+    .setColor("#ffffff")
+    .setTitle(`Live Ranking as of ${cl.convertEpochTo24hr(ranking[0].updated_at)}`)
+    .setImage(ranking[0].user.avatar_url)
+
+    for (let i = 0; i < n; i++)
+    {
+        embed.addField(`Rank ${i+1}`, 
+                       `${ranking[i].user.name}\nPoints: ${ranking[i].point}`);
+    }
+
+    waiter.delete();
+    return message.channel.send(embed);
+}
+
 async function count(message, param)
 {
     let waiter = new cl.Waiter(message);
@@ -328,5 +386,6 @@ module.exports =
     getOnlive,
     getRoomInfo,
     getNextLive,
-    getStageUserList
+    getStageUserList,
+    getLiveRanking
 }
