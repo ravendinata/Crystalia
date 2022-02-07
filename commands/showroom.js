@@ -1,3 +1,4 @@
+const { selectRandomAndCompare } = require('../utils/crystaliaLibrary.js');
 const showroomClient = require('../utils/showroomUtil.js')
 
 console.info("Showroom Module Initialized!");
@@ -45,6 +46,13 @@ module.exports =
                 showroomClient.count(message, param);
                 console.timeEnd(`[PM] Count`);
                 break;
+
+            case "convert": case "translate": case "conv": case "tl":
+                console.time(`[PM] Convert`);
+                showroomClient.convert(message, param);
+                console.timeEnd(`[PM] Convert`);
+                break;
+
         }
     }
 }

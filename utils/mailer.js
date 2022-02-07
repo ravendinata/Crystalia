@@ -1,13 +1,17 @@
 const Mailer = require('nodemailer');
 
-var gmailSvc = Mailer.createTransport
+var mailSvc = Mailer.createTransport
 ({
-    service: 'hotmail',
+    pool: true,
+    host: process.env.mail_host,
+    port: process.env.mail_port,
+    secure: true,
     auth:
     {
         user: process.env.mail_user,
         pass: process.env.mail_password
-    }
+    },
+    tls: { rejectUnauthorized: false, },
 });
 
 module.exports =
@@ -16,13 +20,13 @@ module.exports =
     {
         var message =
         {
-            from: 'skyrin.crystalia@outlook.com',
+            from: 'crystalia@skyrin.tech',
             to: 'raven.limadinata@outlook.com',
             subject: 'Crystalia Notification (Do Not Reply)',
             text: mailContent
         };
 
-        gmailSvc.sendMail(message, function(err, info)
+        mailSvc.sendMail(message, function(err, info)
         {
             if (err)
                 console.info(err);

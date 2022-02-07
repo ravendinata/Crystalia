@@ -375,6 +375,21 @@ async function count(message, param)
     return message.channel.send(embed);
 }
 
+async function convert(message, param)
+{
+    var key;
+
+    if (!isNaN(param))
+        key = await roomIDtoURLKey(param);
+    else
+        key = await urlKeyToRoomID(param);
+
+    let embed = new Discord.MessageEmbed().setColor("ffffff");
+    embed.setDescription(`${param} => ${key}`);
+
+    return message.channel.send(embed);
+}
+
 
 /** ====================
  * * MODULE EXPORTS * * 
@@ -383,6 +398,7 @@ async function count(message, param)
 module.exports =
 {
     count,
+    convert,
     getOnlive,
     getRoomInfo,
     getNextLive,
