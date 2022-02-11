@@ -3,10 +3,20 @@ require('dotenv').config();
 const fs = require('fs');
 const os = require('os');
 const Discord = require('discord.js');
+const express = require('express');
 const ServerInfo = require('./utils/sysHelper');
 const notifier = require('./utils/mailer.js');
 
 const prefix = process.env.prefix;
+
+const app = express();
+app.use(require('express-status-monitor')());
+
+app.get('/', (req, res) => {
+  res.send('Initializing System Monitor...');
+});
+
+app.listen(3000, () => console.log('\nSystem Monitor Initialized on Port 3000!\n'));
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
