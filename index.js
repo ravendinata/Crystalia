@@ -17,7 +17,7 @@ app.get('/', (req, res) => {
   res.send('Initializing System Monitor...');
 });
 
-app.listen(port, () => console.log('\nSystem Monitor Initialized on Port 3000!\n'));
+app.listen(port, () => console.log(`\nSystem Monitor Initialized on Port ${port}!\n`));
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
