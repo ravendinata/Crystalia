@@ -8,6 +8,7 @@ const ServerInfo = require('./utils/sysHelper');
 const notifier = require('./utils/mailer.js');
 
 const prefix = process.env.prefix;
+const port = process.env.PORT || 3000;
 
 const app = express();
 app.use(require('express-status-monitor')());
@@ -16,7 +17,7 @@ app.get('/', (req, res) => {
   res.send('Initializing System Monitor...');
 });
 
-app.listen(3000, () => console.log('\nSystem Monitor Initialized on Port 3000!\n'));
+app.listen(port, () => console.log('\nSystem Monitor Initialized on Port 3000!\n'));
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
