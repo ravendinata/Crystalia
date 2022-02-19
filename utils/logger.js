@@ -7,6 +7,8 @@ let time_now = ("0" + dateObject.getHours()).slice(-2) + ("0" + dateObject.getMi
 if (!fs.existsSync('./logs'))
     fs.mkdirSync('./logs');
 
+fs.writeFileSync('./logs/log.log', '');
+
 function appendLog(log)
 {
     fs.appendFile('./logs/log.log', `${log}\r\n`, (err) =>
