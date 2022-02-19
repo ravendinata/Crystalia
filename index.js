@@ -3,21 +3,13 @@ require('dotenv').config();
 const fs = require('fs');
 const os = require('os');
 const Discord = require('discord.js');
-const express = require('express');
-const ServerInfo = require('./utils/sysHelper');
+
+const logger = require('./utils/logger.js');
+const ServerInfo = require('./utils/sysHelper.js');
 const notifier = require('./utils/mailer.js');
+const webapp = require('./web/webapp.js');
 
-const prefix = process.env.prefix;
-const port = process.env.PORT || 3000;
-
-const app = express();
-app.use(require('express-status-monitor')());
-
-app.get('/', (req, res) => {
-  res.send('Initializing System Monitor...');
-});
-
-app.listen(port, () => console.log(`\nSystem Monitor Initialized on Port ${port}!\n`));
+var prefix = process.env.prefix;
 
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -80,9 +72,9 @@ client.on('message', message =>
 	try
 	{
 		if (args[0] == undefined)
-			console.info(`Called command: ${command} with no arguments`);
+			logger.info(`Called command: ${command} with no arguments`);
 		else
-	    	console.info(`Called command: ${command} with argument ${args}`);
+	    	logger.info(`Called command: ${command} with argument ${args}`);
 		
 		const executable = client.commands.get(command) || client.aliases.get(command);
 		executable.execute(message, args);

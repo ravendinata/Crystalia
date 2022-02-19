@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <%- include('../partials/head'); %>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+    </head>
+    <body class="container">
+        <div class="jumbotron">
+            <h1>Bot Log</h1>
+            <textarea rows="25" cols="115"><%- data %></textarea>
+        </div>
+
+        <script type="text/javascript">
+            setTimeout(function(){ location.reload(); }, 5000);
+        </script>
+    </body>
+</html>
