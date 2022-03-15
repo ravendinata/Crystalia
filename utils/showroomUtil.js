@@ -193,9 +193,11 @@ async function getRoomInfo(message, group, short)
         { name: 'Streaming Now', value: isLive },
         { name: 'Current Stream Start Time', value: currStreamStart },
         { name: 'Current Stream Viewer Count', value: currStreamViewer },
+        { name: 'Stream Streak', value: json.live_continuous_days + " days" },
         { name: 'Room Description', value: json.description }
     )
     .setImage(json.image)
+    .setURL(`https://www.showroom-live.com/${json.room_url_key}`);
 
     waiter.delete();
     return message.channel.send(embed);
