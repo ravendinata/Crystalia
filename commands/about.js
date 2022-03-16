@@ -17,7 +17,7 @@ module.exports =
             { name: 'Description:', value: 'Crystalia is an experimental bot that serves the Japan 48 Group society.'}
         )
         .setFooter('Thank you for using Crystalia!')
-        .setURL('https://crystalia.herokuapp.com//');
+        .setURL('https://crystalia.herokuapp.com/');
         
         return message.channel.send(content);
 	},

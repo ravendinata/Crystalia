@@ -121,11 +121,11 @@ function convertEpochTo24hr(epoch)
 {
     var date = new Date(epoch * 1000); // Convert epoch to date format
 
-    var hh = date.getHours();
+    var hh = date.getUTCHours() + 9; // 9 hours offset to match JST
     var mm = "0" + date.getMinutes();
     var ss = "0" + date.getSeconds();
 
-    return hh + ':' + mm.substr(-2) + ':' + ss.substr(-2); 
+    return hh + ':' + mm.substr(-2) + ':' + ss.substr(-2) + ' JST'; 
 }
 
 /**
