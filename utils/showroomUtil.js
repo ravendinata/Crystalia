@@ -92,15 +92,13 @@ async function getOnlive(message, param)
         waiter.delete();
         return message.channel.send(embed);
     }
+
+    if (param == undefined)
+        embed.setTitle(`:satellite:  Members Currently Streaming | Page 1`)
+                .setFooter(`Members/Rooms Streaming: ${liveCount}`);
     else
-    {
-        if (param == undefined)
-            embed.setTitle(`:satellite:  Members Currently Streaming | Page 1`)
-                    .setFooter(`Members/Rooms Streaming: ${liveCount}`);
-        else
-            embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page 1`)
-                    .setFooter(`'${param}' search results: ${liveCount}`)
-    }
+        embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page 1`)
+                .setFooter(`'${param}' search results: ${liveCount}`)
 
     for (let string, title, page = 1, names = 0; names < liveCount; names++)
     {
@@ -135,6 +133,91 @@ async function getOnlive(message, param)
     }
 
     console.info(`> ${liveCount} Members Streaming | Success!`);
+
+    waiter.delete();
+    return message.channel.send(embed);
+}
+
+async function getScheduledStream(message, param)
+{
+    let waiter = new cl.Waiter(message);
+    await waiter.send(`Fetching scheduled stream list. Please wait...`);
+
+    var json = await getAPI(BASE_API_URL + "/live/upcoming?genre_id=102");
+    var data = json.upcomings;
+    var r1 = data.filter(function(x)
+    { return x.room_url_key.startsWith("akb48_"); })
+    var r2 = data.filter(function(x)
+    { return x.room_url_key.startsWith("48_"); })
+
+    var result = r1.concat(r2);
+
+    if (param != undefined)
+    {
+        var q1 = result.filter(function(x)
+        { return x.room_url_key.toLowerCase().includes(param); })
+
+        var q2 = result.filter(function(x)
+        { return x.main_name.toLowerCase().includes(param); })
+
+        result = q1.concat(q2);
+        var set = new Set(result);
+        result = Array.from(set);
+    }
+
+    const count = result.length;
+    let embed = new Discord.MessageEmbed().setColor("ffffff");
+
+    if (count <= 0)
+    {
+        if (param == undefined)
+            embed.setTitle(`:satellite:  No Scheduled Streams`);
+        else
+            embed.setTitle(`:satellite:  No Scheduled Streams with Keyword '${param}'`);
+
+        waiter.delete();
+        return message.channel.send(embed);
+    }
+
+    if (param == undefined)
+        embed.setTitle(`:satellite:  Scheduled Stream | Page 1`)
+                .setFooter(`Scheduled Streams: ${count}`);
+    else
+        embed.setTitle(`:satellite:  Members with Keyword '${param}' Scheduled Stream | Page 1`)
+                .setFooter(`'${param}' search results: ${count}`)
+
+    for (let string, title, time, page = 1, names = 0; names < count; names++)
+    {
+        string = `https://www.showroom-live.com/${result[names].room_url_key}`;
+        title = result[names].main_name;
+
+        if (result[names].label != undefined)
+            title = title + `|  ${result[names].label}`;
+
+        time = cl.convertEpochTo24hr(result[names].next_live_start_at);
+
+        embed.addField(title, `${time}\n${string}\n\u200B`);
+
+        if (names % 20 == 9 && names != liveCount-1)
+            embed.addField('\u200B\n::: Break :::', '\u200B');
+
+        if (names % 20 == 19 && names >= 19 && names != count-1)
+        {
+            message.channel.send(embed)
+            embed = new Discord.MessageEmbed().setColor("ffffff");
+            
+            ++page;
+
+            if (param == undefined)
+                embed.setTitle(`:satellite:  Members Currently Streaming | Page ${page}`)
+                        .setFooter(`Members/Rooms Streaming: ${count}`);
+            else
+                embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page ${page}`)
+                        .setFooter(`'${param}' search results: ${count}`)
+        }
+    }
+
+    console.info(`> ${count} Scheduled Stream(s) | Success!`);
 
     waiter.delete();
     return message.channel.send(embed);
@@ -402,6 +485,7 @@ module.exports =
     count,
     convert,
     getOnlive,
+    getScheduledStream,
     getRoomInfo,
     getNextLive,
     getStageUserList,

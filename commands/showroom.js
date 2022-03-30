@@ -22,6 +22,12 @@ module.exports =
                 console.timeEnd(`[PM] On Live`);
                 break;
 
+            case "schedule": case "sched": case "scheduled":
+                console.time(`[PM] Schedule`);
+                showroomClient.getScheduledStream(message, param);
+                console.timeEnd(`[PM] Schedule`);
+                break;
+
             case "roominfo": case "room": case "info":
                 console.time(`[PM] Room Info`);
                 showroomClient.getRoomInfo(message, param, optParam);
