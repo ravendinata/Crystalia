@@ -54,7 +54,7 @@ client.on('message', message =>
 {
     if (!message.content.toLowerCase().startsWith(prefix) || message.author.bot) return;
 
-	const args = message.content.slice(prefix.length).toLowerCase().split(" ");
+	const args = message.content.slice(prefix.length).split(" ");
 	const command = args.shift().toLowerCase();
 
 	if (!client.commands.has(command) && !client.aliases.has(command)) return;
