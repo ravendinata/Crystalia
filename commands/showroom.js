@@ -43,7 +43,7 @@ module.exports =
             case "stage": case "podium": case "ranking": case "stageuser": 
             case "liverank": case "rank":
                 console.time(`[PM] Stage User`);
-                showroomClient.getLiveRanking(message, param, optParam);
+                showroomClient.getStageUserList(message, param, optParam);
                 console.timeEnd(`[PM] Stage User`);
                 break;
 
