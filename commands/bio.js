@@ -57,6 +57,12 @@ module.exports =
         {
             color = cl.getGroupColour(args[0]);
 
+            if (err)
+            {
+                message.channel.send(`Failed to connect to database!`);
+                console.info(err);
+            }
+
             con.query(`SELECT * FROM ${args[0]} WHERE short=? OR common=?;`, [args[1], args[1]], function (err, rows)
             {
                 if (err) 
