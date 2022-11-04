@@ -125,7 +125,7 @@ function convertEpochTo24hr(epoch)
     var mm = "0" + date.getMinutes();
     var ss = "0" + date.getSeconds();
 
-    return hh + ':' + mm.substr(-2) + ':' + ss.substr(-2) + ' JST'; 
+    return hh + ':' + mm.slice(-2) + ':' + ss.slice(-2) + ' JST'; 
 }
 
 /**

@@ -61,10 +61,6 @@ function filterNameAndURLKey(data, param)
     return Array.from(set);
 }
 
-/* =======================
-    EXPORTED FUNCTIONS
-======================= */
-
 async function roomIDtoURLKey(room_id)
 {
     const result = await getAPI(`https://www.showroom-live.com/api/room/profile?room_id=${room_id}`);
@@ -76,6 +72,10 @@ async function urlKeyToRoomID(url_key)
     const result = await getAPI(`https://www.showroom-live.com/api/room/status?room_url_key=${url_key}`);
     return await result.room_id;
 }
+
+/* =======================
+    EXPORTED FUNCTIONS
+======================= */
 
 /**
  * Get a list of members onlive/streaming,
@@ -252,7 +252,13 @@ async function getScheduledStream(message, param)
  */
 async function getRoomInfo(message, group, short)
 {
-    const room_id = await cl.getRoomId(group, short);
+    var room_id;
+    
+    if (short != null)
+        room_id = await cl.getRoomId(group, short);
+    else
+        room_id = group;
+
     const endpoint = "/room/profile?room_id=" + room_id;
 
     console.info(`=== DEBUG @ API Fetch ===\n> API Endpoint: ${BASE_API_URL + endpoint}`);
@@ -261,21 +267,18 @@ async function getRoomInfo(message, group, short)
         return message.channel.send("Sorry but we cannot find that room!");
 
     let waiter = new cl.Waiter(message);
-    await waiter.send(`Fetching room information for ${group} ${short}...`);
+    if (short != null)
+        await waiter.send(`Fetching room information for ${group} ${short}...`);
+    else
+        await waiter.send(`Fetching room information using Room ID: ${group}...`);
+
 
     var json = await getAPI(BASE_API_URL + endpoint);
     var isLive = "Not Streaming [Offline]";
-    var currStreamStart = isLive;
-    var currStreamViewer = isLive;
 
     console.log(`> Fetch Check: ${json.main_name}`);
 
-    if (json.is_onlive == true)
-    {
-        isLive = "Yes [Online]";
-        currStreamStart = cl.convertEpochTo24hr(json.current_live_started_at);
-        currStreamViewer = json.view_num;
-    }
+    var img_url = json.image.replace("_m.png", "_l.png");
 
     const embed = new Discord.MessageEmbed()
     .setColor(cl.getGroupColour(group))
@@ -285,15 +288,28 @@ async function getRoomInfo(message, group, short)
         { name: 'Room Name', value: json.main_name },
         { name: 'Room Level', value: json.room_level },
         { name: 'Room ID', value: json.room_id },
-        { name: 'Follower', value: json.follower_num },
-        { name: 'Streaming Now', value: isLive },
-        { name: 'Current Stream Start Time', value: currStreamStart },
-        { name: 'Current Stream Viewer Count', value: currStreamViewer },
+        { name: 'Follower', value: json.follower_num }
+    )
+    .setImage(img_url)
+    .setURL(`https://www.showroom-live.com/${json.room_url_key}`);
+
+    if (json.is_onlive == true)
+    {
+        embed.addFields
+        (
+            { name: 'Streaming Now', value: "Streaming [Online]" },
+            { name: 'Current Stream Start Time', value: cl.convertEpochTo24hr(json.current_live_started_at) },
+            { name: 'Current Stream Viewer Count', value: json.view_num }
+        )
+    }
+    else
+        embed.addField('Streaming Now', "Not Streaming [Offline]");
+
+    embed.addFields
+    (
         { name: 'Stream Streak', value: json.live_continuous_days + " days" },
         { name: 'Room Description', value: json.description }
     )
-    .setImage(json.image)
-    .setURL(`https://www.showroom-live.com/${json.room_url_key}`);
 
     waiter.delete();
     return message.channel.send(embed);
@@ -387,7 +403,7 @@ async function getStageUserList(message, group, short, n = 13)
     return message.channel.send(embed);
 }
 
-async function getLiveRanking(message, group, short, n = 13)
+async function getLiveRanking(message, group, short, n = 13) 
 {
     const room_id = await cl.getRoomId(group, short);
     const key = await roomIDtoURLKey(room_id);
@@ -400,7 +416,7 @@ async function getLiveRanking(message, group, short, n = 13)
     var dom;
     try
     {
-        dom = await JSDOM.fromURL(`https://www.showroom-live.com/${key}`, 
+        dom = await JSDOM.fromURL(`https://www.showroom-live.com/r/${key}`, 
                                   { resources:"usable", runScripts: "dangerously" })
     } 
     catch(ex) { waiter.delete(); }
