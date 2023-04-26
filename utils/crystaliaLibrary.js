@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const prefix = process.env.prefix;
 
 /*
@@ -23,9 +23,10 @@ class Waiter
 
     async send(content = "Please wait...")
     {
-        this.ref = await this.message.channel.send(new Discord.MessageEmbed()
-                                                   .setDescription(content)
-                                                   .setColor("ffffff"));
+        
+        this.ref = await this.message.channel.send({ 
+            embeds: [ new EmbedBuilder().setDescription(content).setColor("ffffff") ] 
+        });
     }
 
     async delete() 
@@ -34,9 +35,11 @@ class Waiter
         catch (error) 
         { 
             console.info(error); 
-            this.message.channel.send(new Discord.MessageEmbed()
-                                      .setDescription("Sorry... We have encountered an error!")
-                                      .setColor("ff0000"));
+            this.message.channel.send({
+                embeds: [ new EmbedBuilder()
+                          .setDescription("Sorry... We have encountered an error!")
+                          .setColor("ff0000") ]
+            });
         }
     }
 }
