@@ -1,8 +1,9 @@
 require('dotenv').config();
 
+const { Client, Collection, GatewayIntentBits, PermissionsBitField} = require('discord.js');
+
 const fs = require('fs');
 const os = require('os');
-const Discord = require('discord.js');
 
 const logger = require('./utils/logger.js');
 const ServerInfo = require('./utils/sysHelper.js');
@@ -11,9 +12,10 @@ const webapp = require('./web/webapp.js');
 
 var prefix = process.env.prefix;
 
-const client = new Discord.Client();
-client.commands = new Discord.Collection();
-client.aliases = new Discord.Collection();
+const client = new Client({ intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent] });
+
+client.commands = new Collection();
+client.aliases = new Collection();
 
 // === VAR END === //
 
@@ -50,7 +52,7 @@ client.once('ready', () =>
 		notifier.sendNotification(`Server Started @ ${os.hostname}!\n${ServerInfo.serverInfo()}`);
 });
 
-client.on('message', message => 
+client.on("messageCreate", async message => 
 {
     if (!message.content.toLowerCase().startsWith(prefix) || message.author.bot) return;
 
@@ -59,7 +61,7 @@ client.on('message', message =>
 
 	if (!client.commands.has(command) && !client.aliases.has(command)) return;
 
-	if (process.env.server_type == "dev" && !message.member.hasPermission('ADMINISTRATOR'))
+	if (process.env.server_type == "dev" && !message.member.permissions.has(PermissionsBitField.Flags.Administrator))
 	{
 		message.reply(`ERROR! Access Denied! You are trying to access Dev Copy but you are not a Developer!` +
 		`\nBot in this prefix ${prefix} is Dev Build. Only developers can access it.`);	
