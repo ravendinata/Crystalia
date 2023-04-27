@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const ServerInfo = require('../utils/sysHelper');
+const ServerInfo = require('../helpers/sysHelper');
 
 console.info("Server Info Module Initialized!");
 

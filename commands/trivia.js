@@ -1,6 +1,6 @@
 /* GLOBALS */
 const Discord = require('discord.js');
-const cl = require('../utils/crystaliaLibrary.js');
+const cl = require('../helpers/crystaliaLibrary.js');
 
 var MAX_ITEM;
 var last = -1;
