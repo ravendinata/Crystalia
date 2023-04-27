@@ -5,9 +5,9 @@ const { Client, Collection, GatewayIntentBits, PermissionsBitField} = require('d
 const fs = require('fs');
 const os = require('os');
 
-const logger = require('./utils/logger.js');
-const ServerInfo = require('./utils/sysHelper.js');
-const notifier = require('./utils/mailer.js');
+const logger = require('./helpers/logger.js');
+const ServerInfo = require('./helpers/sysHelper.js');
+const notifier = require('./helpers/mailer.js');
 const webapp = require('./web/webapp.js');
 
 var prefix = process.env.prefix;

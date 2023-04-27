@@ -1,5 +1,6 @@
-const { selectRandomAndCompare } = require('../utils/crystaliaLibrary.js');
-const showroomClient = require('../utils/showroomUtil.js')
+const { SlashCommandBuilder } = require('discord.js');
+const { selectRandomAndCompare, CommonVariables } = require('../helpers/crystaliaLibrary.js');
+const showroomClient = require('../helpers/showroomUtil.js')
 
 console.info("Showroom Module Initialized!");
 

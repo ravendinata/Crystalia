@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-const cl = require('../utils/crystaliaLibrary.js');
+const cl = require('../helpers/crystaliaLibrary.js');
 const prefix = process.env.prefix;
 
 /* 

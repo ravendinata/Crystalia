@@ -16,6 +16,19 @@ var pool = mysql.createPool({
     database: process.env.db_name
 });
 
+// ========== Common Variables ========== //
+class CommonVariables
+{
+    static groups = (
+        { name: 'AKB48', value: 'akb48' },
+        { name: 'SKE48', value: 'ske48' },
+        { name: 'NMB48', value: 'nmb48' },
+        { name: 'HKT48', value: 'hkt48' },
+        { name: 'NGT48', value: 'ngt48' },
+        { name: 'STU48', value: 'stu48' }
+    );
+}
+
 // ========== Waiter Class ========== //
 class Waiter
 {
@@ -187,6 +200,7 @@ function getRoomId(group, short)
 module.exports =
 {
     Waiter: Waiter, // Waiter class
+    CommonVariables: CommonVariables, // Common variables
 
     randomInteger,
     getGroupColour,
