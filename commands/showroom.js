@@ -8,58 +8,145 @@ module.exports =
 {
     name: 'showroom',
     description: 'Showroom Info command',
-    aliases: ["sr", "sroom"],
-    execute(message, args)
+    data: new SlashCommandBuilder()
+            .setName('showroom')
+            .setDescription('Showroom Info command')
+            // Onlive Subcommand
+            .addSubcommand(subcommand =>
+                subcommand.setName('onlive')
+                    .setDescription('Get On Live Stream')
+                    .addStringOption(option =>
+                        option.setName('filter')
+                            .setDescription('Filter query')
+                            .setRequired(false)))
+            
+            // Scheduled Stream Subcommand
+            .addSubcommand(subcommand =>
+                subcommand.setName('scheduled-stream')
+                    .setDescription('Get Scheduled Stream')
+                    .addStringOption(option =>
+                        option.setName('filter')
+                            .setDescription('Filter query')
+                            .setRequired(false)))
+
+            // Room Info Subcommand
+            .addSubcommand(subcommand =>
+                subcommand.setName('room-info')
+                    .setDescription('Get Room Info')
+                    .addStringOption(option =>
+                        option.setName('group')
+                            .setDescription('Group Name')
+                            .setRequired(true)
+                            .addChoices(CommonVariables.groups))
+                    .addStringOption(option =>
+                        option.setName('member')
+                            .setDescription('Member Name')
+                            .setRequired(true)))
+
+            // Next Live Subcommand
+            .addSubcommand(subcommand =>
+                subcommand.setName('next-stream')
+                    .setDescription('Get Next Live Stream')
+                    .addStringOption(option =>
+                        option.setName('group')
+                            .setDescription('Group Name')
+                            .setRequired(true)
+                            .addChoices(CommonVariables.groups))
+                    .addStringOption(option =>
+                        option.setName('member')
+                            .setDescription('Member Name')
+                            .setRequired(true)))
+                            
+            // Stage User List Subcommand
+            .addSubcommand(subcommand =>
+                subcommand.setName('stage-user-list')
+                    .setDescription('Get Stage User List')
+                    .addStringOption(option =>
+                        option.setName('group')
+                            .setDescription('Group Name')
+                            .setRequired(true)
+                            .addChoices(CommonVariables.groups))
+                    .addStringOption(option =>
+                        option.setName('member')
+                            .setDescription('Member Name')
+                            .setRequired(true)))
+
+            // Active Live Streams Count Subcommand
+            .addSubcommand(subcommand =>
+                subcommand.setName('active-live-streams-count')
+                    .setDescription('Get Count of Active Live Streams')
+                    .addStringOption(option =>
+                        option.setName('filter')
+                            .setDescription('Filter query')
+                            .setRequired(false)))
+
+            // Convert Subcommand
+            .addSubcommand(subcommand =>
+                subcommand.setName('convert')
+                    .setDescription('Convert Room ID to URL Key and vice versa')
+                    .addStringOption(option =>
+                        option.setName('parameter')
+                            .setDescription('Parameter')
+                            .setRequired(true))),
+
+    async execute(interaction)
     {
-        let opt = args[0];
-        let param = args[1];
-        let optParam = args[2];
+        const opt = interaction.options.getSubcommand();
 
         switch(opt)
         {
-            default: case "onlive": case "streaming": case "live":
+            case "onlive":
                 console.time(`[PM] On Live`);
-                showroomClient.getOnlive(message, param);
+                showroomClient.getOnlive(interaction, 
+                                         interaction.options.getString('filter'));
                 console.timeEnd(`[PM] On Live`);
                 break;
 
-            case "schedule": case "sched": case "scheduled":
+            case "scheduled-stream":
                 console.time(`[PM] Schedule`);
-                showroomClient.getScheduledStream(message, param);
+                showroomClient.getScheduledStream(interaction,
+                                                  interaction.options.getString('filter'));
                 console.timeEnd(`[PM] Schedule`);
                 break;
 
-            case "roominfo": case "room": case "info":
+            case "room-info":
                 console.time(`[PM] Room Info`);
-                showroomClient.getRoomInfo(message, param, optParam);
+                showroomClient.getRoomInfo(interaction, 
+                                           interaction.options.getString('group'),
+                                           interaction.options.getString('member'));
                 console.timeEnd(`[PM] Room Info`);
                 break;
 
-            case "next": case "nextlive": case "scheduled": 
+            case "next-stream":
                 console.time(`[PM] Next Live`);
-                showroomClient.getNextLive(message, param, optParam);
+
+                showroomClient.getNextLive(interaction,
+                                           interaction.options.getString('group'),
+                                           interaction.options.getString('member'));
                 console.timeEnd(`[PM] Next Live`);
                 break;
 
-            case "stage": case "podium": case "ranking": case "stageuser": 
-            case "liverank": case "rank":
+            case "stage-user-list":
                 console.time(`[PM] Stage User`);
-                showroomClient.getStageUserList(message, param, optParam);
+                showroomClient.getStageUserList(interaction,
+                                                interaction.options.getString('group'),
+                                                interaction.options.getString('member'));
                 console.timeEnd(`[PM] Stage User`);
                 break;
 
-            case "count": case "num": case "number":
-                console.time(`[PM] Count`);
-                showroomClient.count(message, param);
+            case "active-live-streams-count":
+                console.time(`[PM] Active Live Stream Count`);
+                showroomClient.count(interaction,
+                                     interaction.options.getString('filter'));
                 console.timeEnd(`[PM] Count`);
                 break;
 
-            case "convert": case "translate": case "conv": case "tl":
+            case "convert":
                 console.time(`[PM] Convert`);
-                showroomClient.convert(message, param);
+                showroomClient.convert(interaction,
+                                       interaction.options.getString('parameter'));
                 console.timeEnd(`[PM] Convert`);
                 break;
-
         }
     }
 }
