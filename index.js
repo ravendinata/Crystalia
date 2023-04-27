@@ -52,7 +52,7 @@ client.once('ready', () =>
 		notifier.sendNotification(`Server Started @ ${os.hostname}!\n${ServerInfo.serverInfo()}`);
 });
 
-client.on("messageCreate", async message => 
+/* client.on("messageCreate", async message => 
 {
     if (!message.content.toLowerCase().startsWith(prefix) || message.author.bot) return;
 
@@ -85,6 +85,46 @@ client.on("messageCreate", async message =>
 	{
 		console.error(error);
 		message.reply('There was an error trying to execute that command!');
+	}
+}); */
+
+client.on('interactionCreate', async interaction => 
+{
+	console.info(`\n> Interaction from Channel: ${interaction.channel}; By: ${interaction.user.tag} (UID: ${interaction.user.id})`);
+	
+	try
+	{
+		const command = interaction.client.commands.get(interaction.commandName);
+
+		if (!command) return;
+
+		if (interaction.isChatInputCommand())
+		{
+			console.info(`> Command Received!`);
+			console.info(`  Command Name\t: ${command.name}`);
+			await command.execute(interaction);
+			console.info(''); // Prints a blank line. Just cosmetics for the console logger.
+		}
+		else if (interaction.isAutocomplete())
+		{
+			console.info(`> Autocomplete Request Received!`);
+			await command.autocomplete(interaction);
+		}
+		else return;
+	} 
+	catch (exception)
+	{
+		if (interaction.isAutocomplete)
+			return;
+		
+		if (exception.toString().startsWith('[') || exception.toString().startsWith('DiscordAPIError[10062]: Unknown interaction'))
+			return;
+
+		console.error(`> Error caught! Details:\n${exception}`);
+		console.info(''); // Prints a blank line. Just cosmetics for the console logger.
+			
+		try { await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }); }
+		catch (exception) { await interaction.editReply({ content: 'There was an error while executing this command!', ephemeral: true });}
 	}
 });
 
