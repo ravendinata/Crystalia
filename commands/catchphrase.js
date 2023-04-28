@@ -1,6 +1,5 @@
-const Discord = require('discord.js');
-const cl = require('../helpers/crystaliaLibrary.js');
-const prefix = process.env.prefix;
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
+const { CommonVariables, getGroupColour } = require('../helpers/crystaliaLibrary.js');
 
 /* 
     USE POOLING
@@ -22,73 +21,63 @@ module.exports =
 {
 	name: 'catchphrase',
     description: 'Displays catchphrase of selected member',
-    aliases: ["cp", "jiko"],
-    execute(message, args) 
+    data: new SlashCommandBuilder()
+            .setName('catchphrase')
+            .setDescription('Displays catchphrase of selected member')
+            .addStringOption(option =>
+                option.setName('group')
+                    .setDescription('Group Name')
+                    .setRequired(true)
+                    .addChoices(
+                        { name: 'AKB48', value: 'akb48' },
+                        { name: 'SKE48', value: 'ske48' },
+                        { name: 'NMB48', value: 'nmb48' },
+                        { name: 'HKT48', value: 'hkt48' },
+                        { name: 'NGT48', value: 'ngt48' },
+                        { name: 'STU48', value: 'stu48' }
+                    ))
+            .addStringOption(option =>
+                option.setName('member')
+                    .setDescription('Member Name')
+                    .setRequired(true)),
+
+    async execute(interaction) 
     {
-        if (args[0] == undefined)
-        {
-            message.channel.send(`No arguments found! Use "catchphrase --help" to get arguments list!`);
-            return;
-        }
-
-        if (args[0] == '--help')
-        {
-            const content = new Discord.MessageEmbed()
-            .setColor('#ffffff')
-            .setTitle(`Crystalia Catchphrase Help`)
-            .addFields(
-                { name: 'First Argument', value: '***Group name***\nCurrently Available Groups:\n-AKB48\n-SKE48\n-HKT48\n-NMB48\n-NGT48\n-STU48'},
-                { name: 'Second Argument', value: '***Member name in the order of: Surname + Name*** or ***common nickname of the member***\n\n*) The name may be typed in any letter case.\n\nNote: For members who have the exact same name (Eg: Yokoyama Yui (Team A) and Yokoyama Yui (Team 8)), please add the team letter/number after the name argument.'},
-                { name: `Example (Team 8's Oguri Yui - using Nickname)`, value: `${prefix}catchphrase akb48 yuiyui`},
-                { name: `Example (Team 8's Oguri Yui - using Full Name)`, value: `${prefix}catchphrase akb48 oguriyui`},
-                { name: `Example (Team 8's Yokoyama Yui)`, value: `${prefix}catchphrase akb48 yokoyamayui8`}
-            )
-
-            return message.channel.send(content);
-        }
-
+        const group = interaction.options.getString('group');
+        const member = interaction.options.getString('member');
+        
         pool.getConnection((err, con) =>
         {
-            color = cl.getGroupColour(args[0]);
+            const color = getGroupColour(group);
 
-            con.query(`SELECT * FROM ${args[0]} WHERE short=? OR common=?;`, [args[1], args[1]], function (err, rows)
+            if (err)
             {
-                if (err) 
-                {
-                    message.channel.send(`Argument Error: Cannot find specified group ${args[0].toUpperCase()}!`);
-                    message.channel.send(`Only Japan groups (AKB48, HKT48, NGT48, NMB48, SKE48, STU48) are available at the moment.`);
-                    return;
-                }
+                interaction.reply(`Failed to connect to database!`);
+                console.info(err);
+            }
 
-                if (rows[0] == undefined)
-                {
-                    message.channel.send(`Argument Error: Cannot find ${args[1]} from the Group ${args[0].toUpperCase()}!`);
-                    message.channel.send(`The member may not be available yet or there might be spelling error(s).`);
-                    return;
-                }
-
+            con.query(`SELECT * FROM ${group} WHERE short=?;`, member, function (err, rows)
+            {
                 const result = JSON.stringify(rows[0]);
                 const data = JSON.parse(result);
 
-                // console.info(`CP: ${data.catchphrase}`); // Test Point
-
                 if (!data.catchphrase)
                 {
-                    message.channel.send(`Unfortunately, ${data.name}'s Catchphrase is currently unavailable.`);
+                    interaction.reply(`Unfortunately, ${data.name}'s Catchphrase is currently unavailable.`);
                     return;
                 }
 
-                const bio = new Discord.MessageEmbed()
-                .setColor(color)
-                .setTitle(`${data.name}'s (${data.name_kanji}) Catchphrase`)
-                .addFields(
-                    { name: 'Catchphrase:', value: data.catchphrase }
-                )
-                .setImage(data.img_url)
+                const embed = new EmbedBuilder()
+                                .setTitle(`${data.name}'s (${data.name_kanji}) Catchphrase`)
+                                .setColor(color)
+                                .addFields(
+                                    { name: 'Catchphrase:', value: data.catchphrase }
+                                )
+                                .setImage(data.img_url)
 
                 con.release();
                     
-                return message.channel.send(bio);
+                return interaction.reply({ embeds: [embed] });
             })
         })
     }
