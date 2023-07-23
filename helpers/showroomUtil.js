@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const fetch = require('node-fetch');
 const cl = require('../helpers/crystaliaLibrary.js')
 const { JSDOM } = require('jsdom');
@@ -86,20 +86,18 @@ async function urlKeyToRoomID(url_key)
  * @param param     Search parameters (Can take any filter).
  *                  Doesn't need to be [groupName] [memberShort/memberCommon]
  */
-async function getOnlive(message, param)
+async function getOnlive(interaction, param)
 {
-    let waiter = new cl.Waiter(message);
-    await waiter.send(`Fetching onlive member list. Please wait...`);
-
     var json = await getAPI(BASE_ONLIVE_API_URL);
     var data = json.onlives[0].lives;
     var result = select48Rooms(data);
+    var page = 1;
 
     if (param != undefined)
         result = filterNameAndURLKey(result, param);
 
     const liveCount = result.length;
-    let embed = new Discord.MessageEmbed().setColor("ffffff");
+    let embed = new EmbedBuilder().setColor("ffffff");
 
     if (liveCount <= 0)
     {
@@ -108,18 +106,17 @@ async function getOnlive(message, param)
         else
             embed.setTitle(`:satellite:  No Members with Keyword '${param}' is Currently Streaming`);
 
-        waiter.delete();
-        return message.channel.send(embed);
+        return interaction.reply({ embeds: [embed] });
     }
 
     if (param == undefined)
         embed.setTitle(`:satellite:  Members Currently Streaming | Page 1`)
-             .setFooter(`Members/Rooms Streaming: ${liveCount}`);
+             .setFooter({ text: `Members/Rooms Streaming: ${liveCount}` });
     else
         embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page 1`)
-             .setFooter(`'${param}' search results: ${liveCount}`);
+             .setFooter({ text: `'${param}' search results: ${liveCount}` });
 
-    for (let string, title, page = 1, names = 0; names < liveCount; names++)
+    for (let string, title, names = 0; names < liveCount; names++)
     {
         string = `https://www.showroom-live.com/${result[names].room_url_key}` +
                  `\nStarted at: ${cl.convertEpochTo24hr(result[names].started_at)}`;
@@ -131,31 +128,34 @@ async function getOnlive(message, param)
         if (result[names].telop != undefined)
             string = string + `\nTelop: ${result[names].telop}`;
 
-        embed.addField(title, `${string}\n\u200B`);
+        embed.addFields({ name: title, value: `${string}\n\u200B` });
 
         if (names % 20 == 9 && names != liveCount-1)
-            embed.addField('\u200B\n::: Break :::', '\u200B');
+            embed.addFields({ name: '\u200B\n::: Break :::', value: '\u200B' });
 
         if (names % 20 == 19 && names >= 19 && names != liveCount-1)
         {
-            message.channel.send(embed);
-            embed = new Discord.MessageEmbed().setColor("ffffff");
+            await interaction.reply({ embeds: [embed] })
+            embed = new EmbedBuilder().setColor("ffffff");
             
             ++page;
 
             if (param == undefined)
                 embed.setTitle(`:satellite:  Members Currently Streaming | Page ${page}`)
-                     .setFooter(`Members/Rooms Streaming: ${liveCount}`);
+                     .setFooter({ text: `Members/Rooms Streaming: ${liveCount}` });
             else
                 embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page ${page}`)
-                     .setFooter(`'${param}' search results: ${liveCount}`);
+                     .setFooter({ text: `'${param}' search results: ${liveCount}` });
         }
     }
 
     console.info(`> ${liveCount} Members Streaming | Success!`);
 
-    waiter.delete();
-    return message.channel.send(embed);
+    if (page == 1)
+        return interaction.reply({ embeds: [embed] });
+    else
+        return interaction.followUp({ embeds: [embed] });
+
 }
 
 /**
@@ -167,11 +167,8 @@ async function getOnlive(message, param)
  * @param param     Search parameters (Can take any filter).
  *                  Doesn't need to be [groupName] [memberShort/memberCommon]
  */
-async function getScheduledStream(message, param)
+async function getScheduledStream(interaction, param)
 {
-    let waiter = new cl.Waiter(message);
-    await waiter.send(`Fetching scheduled stream list. Please wait...`);
-
     var json = await getAPI(BASE_API_URL + "/live/upcoming?genre_id=102");
     var data = json.upcomings;
     var result = select48Rooms(data);
@@ -180,7 +177,7 @@ async function getScheduledStream(message, param)
         result = filterNameAndURLKey(result, param);
 
     const count = result.length;
-    let embed = new Discord.MessageEmbed().setColor("ffffff");
+    let embed = new EmbedBuilder().setColor("ffffff");
 
     if (count <= 0)
     {
@@ -189,8 +186,7 @@ async function getScheduledStream(message, param)
         else
             embed.setTitle(`:satellite:  No Scheduled Streams with Keyword '${param}'`);
 
-        waiter.delete();
-        return message.channel.send(embed);
+        return interaction.reply({ embeds: [embed] });
     }
 
     if (param == undefined)
@@ -218,7 +214,7 @@ async function getScheduledStream(message, param)
         if (names % 20 == 19 && names >= 19 && names != count-1)
         {
             message.channel.send(embed)
-            embed = new Discord.MessageEmbed().setColor("ffffff");
+            embed = new EmbedBuilder().setColor("ffffff");
             
             ++page;
 
@@ -233,8 +229,7 @@ async function getScheduledStream(message, param)
 
     console.info(`> ${count} Scheduled Stream(s) | Success!`);
 
-    waiter.delete();
-    return message.channel.send(embed);
+    return interaction.reply({ embeds: [embed] });
 }
 
 /**
@@ -250,7 +245,7 @@ async function getScheduledStream(message, param)
  * @param short     The member identifier, could be memberShort or common
  *                  (ex: yamauchimizuki or zukkii)
  */
-async function getRoomInfo(message, group, short)
+async function getRoomInfo(interaction, group, short)
 {
     var room_id;
     
@@ -264,31 +259,23 @@ async function getRoomInfo(message, group, short)
     console.info(`=== DEBUG @ API Fetch ===\n> API Endpoint: ${BASE_API_URL + endpoint}`);
 
     if (room_id == undefined || room_id == -1)
-        return message.channel.send("Sorry but we cannot find that room!");
-
-    let waiter = new cl.Waiter(message);
-    if (short != null)
-        await waiter.send(`Fetching room information for ${group} ${short}...`);
-    else
-        await waiter.send(`Fetching room information using Room ID: ${group}...`);
-
+        return interaction.reply("Sorry! We cannot find that room!");
 
     var json = await getAPI(BASE_API_URL + endpoint);
-    var isLive = "Not Streaming [Offline]";
 
     console.log(`> Fetch Check: ${json.main_name}`);
 
     var img_url = json.image.replace("_m.png", "_l.png");
 
-    const embed = new Discord.MessageEmbed()
+    const embed = new EmbedBuilder()
     .setColor(cl.getGroupColour(group))
     .setTitle(`${json.main_name} Room Info`)
     .addFields
     (
-        { name: 'Room Name', value: json.main_name },
-        { name: 'Room Level', value: json.room_level },
-        { name: 'Room ID', value: json.room_id },
-        { name: 'Follower', value: json.follower_num }
+        { name: 'Room Name', value: `${json.main_name}` },
+        { name: 'Room Level', value: `${json.room_level}` },
+        { name: 'Room ID', value: `${json.room_id}` },
+        { name: 'Follower', value: `${json.follower_num}` },
     )
     .setImage(img_url)
     .setURL(`https://www.showroom-live.com/${json.room_url_key}`);
@@ -298,21 +285,22 @@ async function getRoomInfo(message, group, short)
         embed.addFields
         (
             { name: 'Streaming Now', value: "Streaming [Online]" },
-            { name: 'Current Stream Start Time', value: cl.convertEpochTo24hr(json.current_live_started_at) },
-            { name: 'Current Stream Viewer Count', value: json.view_num }
+            { name: 'Current Stream Start Time', value: `${cl.convertEpochTo24hr(json.current_live_started_at)}` },
+            { name: 'Current Stream Viewer Count', value: `${json.view_num}` }
         )
     }
     else
-        embed.addField('Streaming Now', "Not Streaming [Offline]");
+        embed.addFields({ name: 'Streaming Now', value: "Not Streaming [Offline]" });
+
+    console.info(`${json.description}`);
 
     embed.addFields
     (
-        { name: 'Stream Streak', value: json.live_continuous_days + " days" },
-        { name: 'Room Description', value: json.description }
+        { name: 'Stream Streak', value: `${json.live_continuous_days} continuous days` },
+        { name: 'Room Description', value: `${json.description.substring(0, 990)}\n\n**<< Read more on SHOWROOM >>**` }
     )
 
-    waiter.delete();
-    return message.channel.send(embed);
+    return interaction.reply({ embeds: [embed] });
 }
 
 /**
@@ -328,7 +316,7 @@ async function getRoomInfo(message, group, short)
  * @param short     The member identifier, could be memberShort or common
  *                  (ex: yamauchimizuki or zukkii)
  */
-async function getNextLive(message, group, short)
+async function getNextLive(interaction, group, short)
 {
     const room_id = await cl.getRoomId(group, short);
     const endpoint = "/room/next_live?room_id=" + room_id;
@@ -336,19 +324,16 @@ async function getNextLive(message, group, short)
     console.info(`=== DEBUG @ API Fetch ===\n> API Endpoint: ${BASE_API_URL + endpoint}`);
 
     if (room_id == undefined || room_id == -1)
-        return message.channel.send("Sorry but we cannot find that room!");
-
-    let waiter = new cl.Waiter(message);
-    await waiter.send(`Fetching next scheduled live for ${group} ${short}...`);
+        return interaction.reply("Sorry! We cannot find that room!");
 
     var json = await getAPI(BASE_API_URL + endpoint);
-    const embed = new Discord.MessageEmbed()
+    
+    const embed = new EmbedBuilder()
     .setColor(cl.getGroupColour(group))
     .setTitle(`Next Scheduled Live`)
-    .addField("Date/Time:", json.text);
+    .addFields({ name: "Date/Time:", value: `${json.text}` });
 
-    waiter.delete();
-    return message.channel.send(embed);
+    return interaction.reply({ embeds: [embed] });
 }
 
 /**
@@ -368,7 +353,7 @@ async function getNextLive(message, group, short)
  *                  (ex: yamauchimizuki or zukkii)
  * @param n         Number of stage users to display (1-n)
  */
-async function getStageUserList(message, group, short, n = 13)
+async function getStageUserList(interaction, group, short, n = 13)
 {
     const room_id = await cl.getRoomId(group, short);
     const endpoint = "/live/stage_user_list?room_id=" + room_id;
@@ -376,10 +361,7 @@ async function getStageUserList(message, group, short, n = 13)
     console.info(`=== DEBUG @ API Fetch ===\n> API Endpoint: ${BASE_API_URL + endpoint}`);
 
     if (room_id == undefined || room_id == -1)
-        return message.channel.send("Sorry but we cannot find that room!");
-
-    let waiter = new cl.Waiter(message);
-    await waiter.send("Fetching stage user list...");
+        return interaction.reply("Sorry! We cannot find that room!");
 
     var json = await getAPI(BASE_API_URL + endpoint);
     const data = json.stage_user_list;
@@ -387,20 +369,18 @@ async function getStageUserList(message, group, short, n = 13)
     if (data[0] == null)
     {
         console.info("> Abort! [Reason: Array Empty! User offline...]");
-        waiter.delete();
-        return message.channel.send("This member is not currently live streaming.\nPlease check again while member is live streaming.");
+        return interaction.reply("This member is not currently live streaming.\nPlease check again while member is live streaming.");
     }
 
-    const embed = new Discord.MessageEmbed()
+    const embed = new EmbedBuilder()
     .setColor("#ffffff")
     .setTitle(`Next Scheduled Live`)
     .setImage(data[0].user.avatar_url);
 
     for (let i = 0; i < n; i++)
-        embed.addField(`Rank ${i+1}`, data[i].user.name);
+        embed.addFields({ name: `Rank ${i+1}`, value: `${data[i].user.name}` });
 
-    waiter.delete();
-    return message.channel.send(embed);
+    return interaction.reply({ embeds: [embed] });
 }
 
 async function getLiveRanking(message, group, short, n = 13) 
@@ -434,7 +414,7 @@ async function getLiveRanking(message, group, short, n = 13)
         return message.channel.send("This member is not currently live streaming.\nPlease check again while member is live streaming.");
     }
 
-    const embed = new Discord.MessageEmbed()
+    const embed = new EmbedBuilder()
     .setColor("#ffffff")
     .setTitle(`Live Ranking as of ${cl.convertEpochTo24hr(ranking[0].updated_at)}`)
     .setImage(ranking[0].user.avatar_url)
@@ -449,11 +429,8 @@ async function getLiveRanking(message, group, short, n = 13)
     return message.channel.send(embed);
 }
 
-async function count(message, param)
+async function count(interaction, param)
 {
-    let waiter = new cl.Waiter(message);
-    await waiter.send("Counting number of members currently streaming...");
-
     var json = await getAPI(BASE_ONLIVE_API_URL);
     var data = json.onlives[0].lives;
     var result = select48Rooms(data);
@@ -462,7 +439,7 @@ async function count(message, param)
         result = filterNameAndURLKey(result, param);
 
     const liveCount = result.length;
-    let embed = new Discord.MessageEmbed().setColor("ffffff");
+    let embed = new EmbedBuilder().setColor("ffffff");
                     
     if (param == undefined)
         embed.setDescription(`${liveCount} members are streaming now`);
@@ -471,11 +448,10 @@ async function count(message, param)
 
     console.info(`> ${liveCount} Members Streaming | Success!`);
 
-    waiter.delete();
-    return message.channel.send(embed);
+    return interaction.reply({ embeds: [embed] });
 }
 
-async function convert(message, param)
+async function convert(interaction, param)
 {
     var key;
 
@@ -484,10 +460,10 @@ async function convert(message, param)
     else
         key = await urlKeyToRoomID(param);
 
-    let embed = new Discord.MessageEmbed().setColor("ffffff");
+    let embed = new EmbedBuilder().setColor("ffffff");
     embed.setDescription(`${param} => ${key}`);
 
-    return message.channel.send(embed);
+    return interaction.reply({ embeds: [embed] });
 }
 
 
