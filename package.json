@@ -1,12 +1,12 @@
 {
-  "name": "Crystalia",
-  "version": "1.0.0",
-  "description": "Experimental Discord Bot",
+  "name": "crystalia",
+  "version": "0.9.7",
+  "description": "Crystalia is an experimental bot that serves the Japan 48 Group society.",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
-  "author": "",
+  "author": "Raven Limadinata",
   "license": "ISC",
   "dependencies": {
     "discord.js": "^14.9.0",

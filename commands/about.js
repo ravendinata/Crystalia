@@ -1,4 +1,5 @@
-const Discord = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
+const PackageInfo = require('../package.json');
 
 console.info("About Module Initialized!");
 
@@ -6,19 +7,27 @@ module.exports =
 {
 	name: 'about',
 	description: 'About Page',
-	execute(message) 
-    {
-		const content = new Discord.MessageEmbed()
+    data: new SlashCommandBuilder()
+            .setName('about')
+            .setDescription('About Page'),
+
+	execute(interaction) 
+    {      
+		const content = new EmbedBuilder()
         .setColor('#ffffff')
         .setTitle(`About Crystalia`)
-        .setAuthor('Raven Limadinata', 'https://ravenlimadinata.com/img/profile.png', 'https://ravenlimadinata.com/')
-        .addFields(
-            { name: 'Version', value: '0.8.0b'},
-            { name: 'Description:', value: 'Crystalia is an experimental bot that serves the Japan 48 Group society.'}
+        .setAuthor(
+            { 
+                name: 'Raven Limadinata', 
+                iconURL: 'https://ravenlimadinata.com/img/profile.png', 
+                url: 'https://ravenlimadinata.com/'
+            }
         )
-        .setFooter('Thank you for using Crystalia!')
-        .setURL('https://crystalia.herokuapp.com/');
+        .addFields(
+            { name: 'Version', value: `${PackageInfo.version}` },
+            { name: 'Description:', value: `${PackageInfo.description}` },
+        );
         
-        return message.channel.send(content);
+        return interaction.reply({ embeds: [content] });
 	},
 };
