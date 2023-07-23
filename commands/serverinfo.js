@@ -1,4 +1,4 @@
-const Discord = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const ServerInfo = require('../helpers/sysHelper');
 
 console.info("Server Info Module Initialized!");
@@ -7,12 +7,24 @@ module.exports =
 {
     name: 'serverinfo',
     description: 'Command to get server information',
-    aliases: ["srvinfo", "srvinf"],
-    execute(message, args)
+    data: new SlashCommandBuilder()
+            .setName('serverinfo')
+            .setDescription('Displays server information')
+            .addStringOption(option => 
+                option.setName('type')
+                    .setDescription('Type of information to display')
+                    .setRequired(true)
+                    .addChoices(
+                        { name: 'Platform', value: 'platform' },
+                        { name: 'Resource Usage', value: 'resusage' }
+                    )),
+                    
+    execute(interaction)
     {
-        const embed = new Discord.MessageEmbed();
+        const type = interaction.options.getString('type');
+        const embed = new EmbedBuilder().setTitle("Server Information");
 
-        switch(args[0])
+        switch(type.toLowerCase())
         {
             default: case "platform":
                 embed.setColor("000000").setDescription(ServerInfo.serverInfo());
@@ -23,6 +35,6 @@ module.exports =
                 break;
         }
 
-        return message.channel.send(embed);
+        return interaction.reply({ embeds: [embed] });
     }
 }
