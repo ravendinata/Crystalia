@@ -46,10 +46,10 @@ module.exports =
         const group = interaction.options.getString('group');
         const member = interaction.options.getString('member');
         
+        const color = getGroupColour(group);
+
         pool.getConnection((err, con) =>
         {
-            const color = getGroupColour(group);
-
             if (err)
             {
                 interaction.reply(`Failed to connect to database!`);

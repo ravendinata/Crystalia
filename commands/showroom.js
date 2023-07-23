@@ -37,7 +37,14 @@ module.exports =
                         option.setName('group')
                             .setDescription('Group Name')
                             .setRequired(true)
-                            .addChoices(CommonVariables.groups))
+                            .addChoices(
+                                { name: 'AKB48', value: 'akb48' },
+                                { name: 'SKE48', value: 'ske48' },
+                                { name: 'NMB48', value: 'nmb48' },
+                                { name: 'HKT48', value: 'hkt48' },
+                                { name: 'NGT48', value: 'ngt48' },
+                                { name: 'STU48', value: 'stu48' }
+                            ))
                     .addStringOption(option =>
                         option.setName('member')
                             .setDescription('Member Name')
@@ -51,7 +58,14 @@ module.exports =
                         option.setName('group')
                             .setDescription('Group Name')
                             .setRequired(true)
-                            .addChoices(CommonVariables.groups))
+                            .addChoices(
+                                { name: 'AKB48', value: 'akb48' },
+                                { name: 'SKE48', value: 'ske48' },
+                                { name: 'NMB48', value: 'nmb48' },
+                                { name: 'HKT48', value: 'hkt48' },
+                                { name: 'NGT48', value: 'ngt48' },
+                                { name: 'STU48', value: 'stu48' }
+                            ))
                     .addStringOption(option =>
                         option.setName('member')
                             .setDescription('Member Name')
@@ -65,7 +79,14 @@ module.exports =
                         option.setName('group')
                             .setDescription('Group Name')
                             .setRequired(true)
-                            .addChoices(CommonVariables.groups))
+                            .addChoices(
+                                { name: 'AKB48', value: 'akb48' },
+                                { name: 'SKE48', value: 'ske48' },
+                                { name: 'NMB48', value: 'nmb48' },
+                                { name: 'HKT48', value: 'hkt48' },
+                                { name: 'NGT48', value: 'ngt48' },
+                                { name: 'STU48', value: 'stu48' }
+                            ))
                     .addStringOption(option =>
                         option.setName('member')
                             .setDescription('Member Name')
