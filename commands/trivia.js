@@ -1,5 +1,5 @@
 /* GLOBALS */
-const Discord = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const cl = require('../helpers/crystaliaLibrary.js');
 
 var MAX_ITEM;
@@ -45,9 +45,19 @@ module.exports =
 {
     name: 'trivia',
     description: 'Displays a randomly picked trivia',
-    execute(message, args)
+    data: new SlashCommandBuilder()
+            .setName('trivia')
+            .setDescription('Displays a randomly picked trivia')
+            .addStringOption(option =>
+                option.setName('keyword')
+                    .setDescription('Keyword to specify trivia category')
+                    .setRequired(false)),
+
+    execute(interaction)
     {
-        if (args[0] == undefined)
+        const keyword = interaction.options.getString('keyword');
+
+        if (keyword == null)
         {
             var min = 1;
             var id = chooseTrivia(min, MAX_ITEM);
@@ -59,12 +69,12 @@ module.exports =
                     if (err || rows[0] == undefined)
                     {
                         console.info(err);
-                        return message.channel.send(`We have just encountered an error. Please try again later.`);
+                        return interaction.reply(`We have just encountered an error. Please try again later.`);
                     }
 
                     con.release();
 
-                    return message.channel.send(createEmbed(rows[0]));
+                    return interaction.reply({ embeds: [createEmbed(rows[0])] });
                 })
             })
         }
@@ -72,16 +82,16 @@ module.exports =
         {
             pool.getConnection((err, con) => 
             {
-                con.query(`SELECT * FROM trivia WHERE groupName=? OR memberNick=? OR memberShort=?;`, [args[0], args[0], args[0]], function (err, rows)
+                con.query(`SELECT * FROM trivia WHERE groupName=? OR memberNick=? OR memberShort=?;`, [keyword, keyword, keyword], function (err, rows)
                 {
                     if (err)
                     {
                         console.info(err);
-                        return message.channel.send(`We have just encountered an error. Please try again later.`);
+                        return interaction.reply(`We have just encountered an error. Please try again later.`);
                     }
 
                     if (rows[0] == undefined)
-                        return message.channel.send(`We can't seem to find anything with that argument/parameter :(`);
+                        return interaction.reply(`We can't seem to find anything with that argument/parameter :(`);
 
                     var min = 0;
                     var max = rows.length-1;
@@ -90,7 +100,7 @@ module.exports =
 
                     con.release();
 
-                    return message.channel.send(createEmbed(rows[id]));
+                    return interaction.reply({ embeds: [createEmbed(rows[id])] });
                 })
             })
         }
@@ -106,17 +116,15 @@ function setItemMax(max) { MAX_ITEM = max; }
 function createEmbed(plainData)
 {
     console.info(`Creating embed...`);
-    const result = JSON.stringify(plainData);
+
+    const result = JSON.stringify(plainData);    
     const data = JSON.parse(result);
-
-    console.info(data);
-
     const color = cl.getGroupColour(data.groupName);
 
-    const output = new Discord.MessageEmbed()
+    const output = new EmbedBuilder()
     .setColor(color)
     .setTitle(`Trivia`)
-    .setDescription(data.trivia);
+    .setDescription(`${data.trivia}`);
 
     console.info(`Posting embed...`);
     return output;
