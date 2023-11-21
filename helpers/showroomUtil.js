@@ -23,8 +23,16 @@ function getUrlKey(url) { return url.replace(BASE_URL + '/', ''); }
  */
 async function getAPI(url)
 {
-    const response = await fetch(url, METHOD_GET);
-    return await response.json();
+    try
+    {
+        const response = await fetch(url, METHOD_GET);
+        
+        if (!response.ok) 
+            throw new Error(`HTTP error! Status: ${response.statusText}`);
+        
+        return await response.json();
+    } 
+    catch(ex) { console.error(`Error encountered while fetching data...\nError:\n${ex.message}`); }
 }
 
 /**
@@ -32,15 +40,7 @@ async function getAPI(url)
  * @param {*} data The fetched room list
  * @returns Room list with only rooms associated to 48 group
  */
-function select48Rooms(data)
-{
-    var r1 = data.filter(function(x)
-    { return x.room_url_key.startsWith("akb48_"); })
-    var r2 = data.filter(function(x)
-    { return x.room_url_key.startsWith("48_"); })
-
-    return r1.concat(r2);
-}
+const select48Rooms = data => data.filter(x => x.room_url_key.startsWith('akb48_') || x.room_url_key.startsWith('48_'));
 
 /**
  * Filters the fetched room list data by parameter.
@@ -191,10 +191,10 @@ async function getScheduledStream(interaction, param)
 
     if (param == undefined)
         embed.setTitle(`:satellite:  Scheduled Stream | Page 1`)
-             .setFooter(`Scheduled Streams: ${count}`);
+             .setFooter({ text: `Scheduled Streams: ${count}` });
     else
         embed.setTitle(`:satellite:  Members with Keyword '${param}' Scheduled Stream | Page 1`)
-             .setFooter(`'${param}' search results: ${count}`);
+             .setFooter({ text: `'${param}' search results: ${count} `});
 
     for (let string, title, time, page = 1, names = 0; names < count; names++)
     {
