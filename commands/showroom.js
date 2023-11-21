@@ -114,6 +114,8 @@ module.exports =
     {
         const opt = interaction.options.getSubcommand();
 
+        await interaction.deferReply();
+
         switch(opt)
         {
             case "onlive":
@@ -140,7 +142,6 @@ module.exports =
 
             case "next-stream":
                 console.time(`[PM] Next Live`);
-
                 showroomClient.getNextLive(interaction,
                                            interaction.options.getString('group'),
                                            interaction.options.getString('member'));
@@ -159,7 +160,7 @@ module.exports =
                 console.time(`[PM] Active Live Stream Count`);
                 showroomClient.count(interaction,
                                      interaction.options.getString('filter'));
-                console.timeEnd(`[PM] Count`);
+                console.timeEnd(`[PM] Active Live Stream Count`);
                 break;
 
             case "convert":

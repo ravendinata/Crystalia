@@ -48,17 +48,9 @@ const select48Rooms = data => data.filter(x => x.room_url_key.startsWith('akb48_
  * @param {*} param Filter parameters the function shouid match
  * @returns Filtered room list
  */
-function filterNameAndURLKey(data, param)
-{
-    var q1 = data.filter(function(x)
-    { return x.room_url_key.toLowerCase().includes(param); })
-
-    var q2 = data.filter(function(x)
-    { return x.main_name.toLowerCase().includes(param); })
-
-    result = q1.concat(q2);
-    var set = new Set(result);
-    return Array.from(set);
+function filterNameAndURLKey(data, param) {
+    const result = data.filter(x => x.room_url_key.toLowerCase().includes(param) || x.main_name.toLowerCase().includes(param));
+    return Array.from(new Set(result));
 }
 
 async function roomIDtoURLKey(room_id)
@@ -88,33 +80,23 @@ async function urlKeyToRoomID(url_key)
  */
 async function getOnlive(interaction, param)
 {
-    var json = await getAPI(BASE_ONLIVE_API_URL);
-    var data = json.onlives[0].lives;
-    var result = select48Rooms(data);
+    const json = await getAPI(BASE_ONLIVE_API_URL);
+    var result = select48Rooms(json.onlives[0].lives);
     var page = 1;
 
-    if (param != undefined)
+    if (param)
         result = filterNameAndURLKey(result, param);
 
     const liveCount = result.length;
-    let embed = new EmbedBuilder().setColor("ffffff");
+    const embed = new EmbedBuilder().setColor("ffffff");
 
-    if (liveCount <= 0)
-    {
-        if (param == undefined)
-            embed.setTitle(`:satellite:  No Members Currently Streaming`);
-        else
-            embed.setTitle(`:satellite:  No Members with Keyword '${param}' is Currently Streaming`);
-
-        return interaction.reply({ embeds: [embed] });
+    if (liveCount <= 0) {
+        embed.setTitle(`:satellite:  No Members ${param ? `with Keyword '${param}'` : ''} Currently Streaming`);
+        return interaction.editReply({ embeds: [embed] });
     }
 
-    if (param == undefined)
-        embed.setTitle(`:satellite:  Members Currently Streaming | Page 1`)
-             .setFooter({ text: `Members/Rooms Streaming: ${liveCount}` });
-    else
-        embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page 1`)
-             .setFooter({ text: `'${param}' search results: ${liveCount}` });
+    embed.setTitle(`:satellite:  Members ${param ? `with Keyword '${param}'` : ''} Currently Streaming | Page 1`)
+        .setFooter({ text: `${param ? `'${param}' search results` : 'Members/Rooms Streaming'}: ${liveCount}` });
 
     for (let string, title, names = 0; names < liveCount; names++)
     {
@@ -122,40 +104,35 @@ async function getOnlive(interaction, param)
                  `\nStarted at: ${cl.convertEpochTo24hr(result[names].started_at)}`;
         title = result[names].main_name;
 
-        if (result[names].label != undefined)
-            title = title + `|  ${result[names].label}`;
+        if (result[names].label)
+            title += `|  ${result[names].label}`;
         
-        if (result[names].telop != undefined)
-            string = string + `\nTelop: ${result[names].telop}`;
+        if (result[names].telop)
+            string += `\nTelop: ${result[names].telop}`;
 
         embed.addFields({ name: title, value: `${string}\n\u200B` });
 
-        if (names % 20 == 9 && names != liveCount-1)
+        if (names % 20 === 9 && names != liveCount - 1)
             embed.addFields({ name: '\u200B\n::: Break :::', value: '\u200B' });
 
-        if (names % 20 == 19 && names >= 19 && names != liveCount-1)
+        if (names % 20 === 19 && names >= 19 && names != liveCount - 1)
         {
-            await interaction.reply({ embeds: [embed] })
+            await interaction.editReply({ embeds: [embed] })
             embed = new EmbedBuilder().setColor("ffffff");
             
             ++page;
 
-            if (param == undefined)
-                embed.setTitle(`:satellite:  Members Currently Streaming | Page ${page}`)
-                     .setFooter({ text: `Members/Rooms Streaming: ${liveCount}` });
-            else
-                embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page ${page}`)
-                     .setFooter({ text: `'${param}' search results: ${liveCount}` });
+            embed.setTitle(`:satellite:  Members ${param ? `with Keyword '${param}'` : ''} Currently Streaming | Page ${page}`)
+                .setFooter({ text: `${param ? `'${param}' search results` : 'Members/Rooms Streaming'}: ${liveCount}` });
         }
     }
 
     console.info(`> ${liveCount} Members Streaming | Success!`);
 
-    if (page == 1)
-        return interaction.reply({ embeds: [embed] });
+    if (page === 1)
+        return interaction.editReply({ embeds: [embed] });
     else
         return interaction.followUp({ embeds: [embed] });
-
 }
 
 /**
@@ -169,11 +146,10 @@ async function getOnlive(interaction, param)
  */
 async function getScheduledStream(interaction, param)
 {
-    var json = await getAPI(BASE_API_URL + "/live/upcoming?genre_id=102");
-    var data = json.upcomings;
-    var result = select48Rooms(data);
+    const json = await getAPI(`${BASE_API_URL}/live/upcoming?genre_id=102`);
+    var result = select48Rooms(json.upcomings);
 
-    if (param != undefined)
+    if (param)
         result = filterNameAndURLKey(result, param);
 
     const count = result.length;
@@ -181,35 +157,27 @@ async function getScheduledStream(interaction, param)
 
     if (count <= 0)
     {
-        if (param == undefined)
-            embed.setTitle(`:satellite:  No Scheduled Streams`);
-        else
-            embed.setTitle(`:satellite:  No Scheduled Streams with Keyword '${param}'`);
-
-        return interaction.reply({ embeds: [embed] });
+        embed.setTitle(`:satellite:  No Scheduled Streams ${param ? `with Keyword '${param}'` : ''}`);
+        return interaction.editReply({ embeds: [embed] });
     }
-
-    if (param == undefined)
-        embed.setTitle(`:satellite:  Scheduled Stream | Page 1`)
-             .setFooter({ text: `Scheduled Streams: ${count}` });
-    else
-        embed.setTitle(`:satellite:  Members with Keyword '${param}' Scheduled Stream | Page 1`)
-             .setFooter({ text: `'${param}' search results: ${count} `});
+    
+    embed.setTitle(`:satellite:  ${param ? `Members with Keyword '${param}' ` : ''} Scheduled Stream | Page 1`)
+         .setFooter({ text: `${param ? `'${param}' search results` : 'Scheduled Streams'}: ${count}` });
 
     for (let string, title, time, page = 1, names = 0; names < count; names++)
     {
         string = `https://www.showroom-live.com/${result[names].room_url_key}`;
         title = result[names].main_name;
 
-        if (result[names].label != undefined)
-            title = title + `|  ${result[names].label}`;
+        if (result[names].label)
+            title += `|  ${result[names].label}`;
 
         time = cl.convertEpochTo24hr(result[names].next_live_start_at);
 
-        embed.addField(title, `Scheduled for: ${time}\n${string}\n\u200B`);
+        embed.addFields({ name: title, value: `Scheduled for: ${time}\n${string}\n\u200B` });
 
-        if (names % 20 == 9 && names != liveCount-1)
-            embed.addField('\u200B\n::: Break :::', '\u200B');
+        if (names % 20 == 9 && names != count-1)
+        embed.addFields({ name: '\u200B\n::: Break :::', value: '\u200B' });
 
         if (names % 20 == 19 && names >= 19 && names != count-1)
         {
@@ -218,18 +186,14 @@ async function getScheduledStream(interaction, param)
             
             ++page;
 
-            if (param == undefined)
-                embed.setTitle(`:satellite:  Members Currently Streaming | Page ${page}`)
-                     .setFooter(`Members/Rooms Streaming: ${count}`);
-            else
-                embed.setTitle(`:satellite:  Members with Keyword '${param}' Currently Streaming | Page ${page}`)
-                     .setFooter(`'${param}' search results: ${count}`);
+            embed.setTitle(`:satellite:  ${param ? `Members with Keyword '${param}' ` : ''} Scheduled Stream | Page ${page}`)
+                .setFooter({ text: `${param ? `'${param}' search results` : 'Scheduled Streams'}: ${count}` });
         }
     }
 
     console.info(`> ${count} Scheduled Stream(s) | Success!`);
 
-    return interaction.reply({ embeds: [embed] });
+    return interaction.editReply({ embeds: [embed] });
 }
 
 /**
@@ -247,25 +211,19 @@ async function getScheduledStream(interaction, param)
  */
 async function getRoomInfo(interaction, group, short)
 {
-    var room_id;
-    
-    if (short != null)
-        room_id = await cl.getRoomId(group, short);
-    else
-        room_id = group;
+    const room_id = await cl.getRoomId(group, short);
+    const endpoint = `${BASE_API_URL}/room/profile?room_id=${room_id}`;
 
-    const endpoint = "/room/profile?room_id=" + room_id;
-
-    console.info(`=== DEBUG @ API Fetch ===\n> API Endpoint: ${BASE_API_URL + endpoint}`);
+    console.info(`=== DEBUG @ API Fetch ===\n> API Endpoint: ${endpoint}`);
 
     if (room_id == undefined || room_id == -1)
-        return interaction.reply("Sorry! We cannot find that room!");
+        return interaction.editReply("Sorry! We cannot find that room!");
 
-    var json = await getAPI(BASE_API_URL + endpoint);
+    const json = await getAPI(endpoint);
 
     console.log(`> Fetch Check: ${json.main_name}`);
 
-    var img_url = json.image.replace("_m.png", "_l.png");
+    const img_url = json.image.replace("_m.png", "_l.png");
 
     const embed = new EmbedBuilder()
     .setColor(cl.getGroupColour(group))
@@ -280,7 +238,7 @@ async function getRoomInfo(interaction, group, short)
     .setImage(img_url)
     .setURL(`https://www.showroom-live.com/${json.room_url_key}`);
 
-    if (json.is_onlive == true)
+    if (json.is_onlive)
     {
         embed.addFields
         (
@@ -300,7 +258,7 @@ async function getRoomInfo(interaction, group, short)
         { name: 'Room Description', value: `${json.description.substring(0, 990)}\n\n**<< Read more on SHOWROOM >>**` }
     )
 
-    return interaction.reply({ embeds: [embed] });
+    return interaction.editReply({ embeds: [embed] });
 }
 
 /**
@@ -319,21 +277,21 @@ async function getRoomInfo(interaction, group, short)
 async function getNextLive(interaction, group, short)
 {
     const room_id = await cl.getRoomId(group, short);
-    const endpoint = "/room/next_live?room_id=" + room_id;
+    const endpoint = `${BASE_API_URL}/room/next_live?room_id=${room_id}`;
 
-    console.info(`=== DEBUG @ API Fetch ===\n> API Endpoint: ${BASE_API_URL + endpoint}`);
+    console.info(`=== DEBUG @ API Fetch ===\n> API Endpoint: ${endpoint}`);
 
     if (room_id == undefined || room_id == -1)
-        return interaction.reply("Sorry! We cannot find that room!");
+        return interaction.editReply("Sorry! We cannot find that room!");
 
-    var json = await getAPI(BASE_API_URL + endpoint);
+    const json = await getAPI(endpoint);
     
     const embed = new EmbedBuilder()
     .setColor(cl.getGroupColour(group))
     .setTitle(`Next Scheduled Live`)
     .addFields({ name: "Date/Time:", value: `${json.text}` });
 
-    return interaction.reply({ embeds: [embed] });
+    return interaction.editReply({ embeds: [embed] });
 }
 
 /**
@@ -356,20 +314,20 @@ async function getNextLive(interaction, group, short)
 async function getStageUserList(interaction, group, short, n = 13)
 {
     const room_id = await cl.getRoomId(group, short);
-    const endpoint = "/live/stage_user_list?room_id=" + room_id;
+    const endpoint = `${BASE_API_URL}/live/stage_user_list?room_id=${room_id}`;
 
-    console.info(`=== DEBUG @ API Fetch ===\n> API Endpoint: ${BASE_API_URL + endpoint}`);
+    console.info(`=== DEBUG @ API Fetch ===\n> API Endpoint: ${endpoint}`);
 
     if (room_id == undefined || room_id == -1)
-        return interaction.reply("Sorry! We cannot find that room!");
+        return interaction.editReply("Sorry! We cannot find that room!");
 
-    var json = await getAPI(BASE_API_URL + endpoint);
+    const json = await getAPI(endpoint);
     const data = json.stage_user_list;
 
     if (data[0] == null)
     {
         console.info("> Abort! [Reason: Array Empty! User offline...]");
-        return interaction.reply("This member is not currently live streaming.\nPlease check again while member is live streaming.");
+        return interaction.editReply("This member is not currently live streaming.\nPlease check again while member is live streaming.");
     }
 
     const embed = new EmbedBuilder()
@@ -380,90 +338,30 @@ async function getStageUserList(interaction, group, short, n = 13)
     for (let i = 0; i < n; i++)
         embed.addFields({ name: `Rank ${i+1}`, value: `${data[i].user.name}` });
 
-    return interaction.reply({ embeds: [embed] });
-}
-
-async function getLiveRanking(message, group, short, n = 13) 
-{
-    const room_id = await cl.getRoomId(group, short);
-    const key = await roomIDtoURLKey(room_id);
-
-    console.info(`\n=== DEBUG @ API Fetch ===\n> URL Key: ${key}`);
-
-    let waiter = new cl.Waiter(message);
-    await waiter.send("Fetching live ranking...");
-
-    var dom;
-    try
-    {
-        dom = await JSDOM.fromURL(`https://www.showroom-live.com/r/${key}`, 
-                                  { resources:"usable", runScripts: "dangerously" })
-    } 
-    catch(ex) { waiter.delete(); }
-
-    const node = dom.window.document.getElementById('js-live-data');
-    const json = JSON.parse(node.getAttribute("data-json"));
-    const ranking = json.ranking.live_ranking;
-    
-    dom.window.close();
-
-    if (ranking[0] == null)
-    {
-        console.info("> Abort! [Reason: User offline...]");
-        waiter.delete();
-        return message.channel.send("This member is not currently live streaming.\nPlease check again while member is live streaming.");
-    }
-
-    const embed = new EmbedBuilder()
-    .setColor("#ffffff")
-    .setTitle(`Live Ranking as of ${cl.convertEpochTo24hr(ranking[0].updated_at)}`)
-    .setImage(ranking[0].user.avatar_url)
-
-    for (let i = 0; i < n; i++)
-    {
-        embed.addField(`Rank ${i+1}`, 
-                       `${ranking[i].user.name}\nPoints: ${ranking[i].point}`);
-    }
-
-    waiter.delete();
-    return message.channel.send(embed);
+    return interaction.editReply({ embeds: [embed] });
 }
 
 async function count(interaction, param)
 {
-    var json = await getAPI(BASE_ONLIVE_API_URL);
-    var data = json.onlives[0].lives;
-    var result = select48Rooms(data);
+    const json = await getAPI(BASE_ONLIVE_API_URL);
+    var result = select48Rooms(json.onlives[0].lives);
 
-    if (param != undefined)
+    if (param)
         result = filterNameAndURLKey(result, param);
 
-    const liveCount = result.length;
-    let embed = new EmbedBuilder().setColor("ffffff");
-                    
-    if (param == undefined)
-        embed.setDescription(`${liveCount} members are streaming now`);
-    else
-        embed.setDescription(`${liveCount} members with keyword '${param}' are streaming now`);
+    const embed = new EmbedBuilder().setColor("ffffff");
+    embed.setDescription(`${result.length} members ${param ? `with keyword '${param}' ` : ''}are streaming now`);
 
-    console.info(`> ${liveCount} Members Streaming | Success!`);
+    console.info(`> ${result.length} Members Streaming | Success!`);
 
-    return interaction.reply({ embeds: [embed] });
+    return interaction.editReply({ embeds: [embed] });
 }
 
 async function convert(interaction, param)
 {
-    var key;
-
-    if (!isNaN(param))
-        key = await roomIDtoURLKey(param);
-    else
-        key = await urlKeyToRoomID(param);
-
-    let embed = new EmbedBuilder().setColor("ffffff");
-    embed.setDescription(`${param} => ${key}`);
-
-    return interaction.reply({ embeds: [embed] });
+    const key = isNaN(param) ? await urlKeyToRoomID(param) : await roomIDtoURLKey(param);
+    const embed = new EmbedBuilder().setColor("ffffff").setDescription(`${param} => ${key}`);
+    return interaction.editReply({ embeds: [embed] });
 }
 
 
@@ -479,6 +377,5 @@ module.exports =
     getScheduledStream,
     getRoomInfo,
     getNextLive,
-    getStageUserList,
-    getLiveRanking
+    getStageUserList
 }
