@@ -64,6 +64,20 @@ module.exports =
 
             con.query(`SELECT * FROM ${group} WHERE short=?;`, member, function (err, rows)
             {
+                if (err)
+                {
+                    interaction.reply(`Our apologies. We have encountered an error while accessing the database.`);
+                    console.info(err);
+                    return;
+                }
+
+                if (rows.length == 0)
+                {
+                    interaction.reply(`We are sorry, but we currently do not have ${member}'s biography in our database!`);
+                    console.info(`  No data found for ${member} in ${group}!`);
+                    return;
+                }
+
                 const result = JSON.stringify(rows[0]);
                 const data = JSON.parse(result);
 
