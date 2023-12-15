@@ -137,7 +137,7 @@ function convertEpochTo24hr(epoch)
 {
     var date = new Date(epoch * 1000); // Convert epoch to date format
 
-    var hh = date.getUTCHours() + 9; // 9 hours offset to match JST
+    var hh = (date.getUTCHours() + 9) % 24; // 9 hours offset to match JST
     var mm = "0" + date.getMinutes();
     var ss = "0" + date.getSeconds();
 
