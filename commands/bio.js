@@ -1,25 +1,10 @@
 const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const { CommonVariables, getGroupColour } = require('../helpers/crystaliaLibrary.js');
+const { Database } = require('../helpers/database.js');
+const { Error } = require('../helpers/constants.js');
 
-/* 
-    USE POOLING
-    -----------
-    Helps prevent module from being disconnedted after long period of inactivity.
-    Use .env to add the server details!
-*/
-var mysql = require('mysql');
-var pool = mysql.createPool({
-    host: process.env.db_host,
-    user: process.env.db_user,
-    password: process.env.db_password,
-    database: process.env.db_name
-});
-
-//Original connection method
-/* con.connect(function(err) {
-    if (err) throw err;
-    console.log("Connected to Database!");
-})  */
+const GROUP_LOGO = require(`${process.env.data_path}/group_logo.json`);
+const BASE_URLS = require(`${process.env.data_path}/base_urls.json`);
 
 console.info("Bio Module Initialized!");
 
@@ -49,55 +34,70 @@ module.exports =
     
     async execute(interaction) 
     {
+        await interaction.deferReply();
+
         const group = interaction.options.getString('group');
         const member = interaction.options.getString('member');
         
         const color = getGroupColour(group);
 
-        pool.getConnection((err, con) => 
+        const db = Database.getInstance();
+        const mem_data = db.getMember(group, member);
+
+        console.info(mem_data);
+
+        if (mem_data === Error.GROUP_NOT_FOUND)
         {
-            if (err)
-            {
-                interaction.reply(`Failed to connect to database!`);
-                console.info(err);
-            }
+            console.info("  Group not found!");
+            interaction.editReply(`Cannot find group ${group.toUpperCase()}.`);
+            return;
+        }
 
-            con.query(`SELECT * FROM ${group} WHERE short=?;`, member, function (err, rows)
-            {
-                if (err)
-                {
-                    interaction.reply(`Our apologies. We have encountered an error while accessing the database.`);
-                    console.info(err);
-                    return;
-                }
+        if (mem_data === Error.MEM_NOT_FOUND)
+        {
+            console.info("  Member not found!");
+            interaction.editReply(`Cannot find member ${member} in ${group.toUpperCase()}.`);
+            return;
+        }
 
-                if (rows.length == 0)
-                {
-                    interaction.reply(`We are sorry, but we currently do not have ${member}'s biography in our database!`);
-                    console.info(`  No data found for ${member} in ${group}!`);
-                    return;
-                }
+        const embed = new EmbedBuilder()
+                        .setTitle(`${member}'s Biography`)
+                        .setColor(color)
+                        .setAuthor({ name: `${group.toUpperCase()}`, iconURL: GROUP_LOGO[group], url: BASE_URLS.group_homepage[group] })
+                        .addFields(
+                            { name: 'Nickname:', value: mem_data.getNickname() },
+                            { name: 'Kanji Name:', value: mem_data.getKanji() },
+                            { name: 'Birthdate:', value: mem_data.getBirthdate(), inline: true },
+                            { name: 'Birthplace:', value: mem_data.getBirthplace(), inline: true },
+                            { name: 'Height:', value: mem_data.getHeight(), inline: true },
+                            { name: 'Bloodtype:', value: mem_data.getBloodtype(), inline: true },
+                            { name: 'Agency', value: mem_data.getAgency(), inline: true },
+                            { name: "Generation", value: mem_data.getGeneration(), inline: true },
+                        )
+                        .setImage(mem_data.getProfilePicture())
+                        .setThumbnail(mem_data.getThumbnail());
+        
+        if (mem_data.getTeam() != null)
+            embed.addFields({ name: 'Team', value: mem_data.getTeam() });
 
-                const result = JSON.stringify(rows[0]);
-                const data = JSON.parse(result);
+        let sns_text = "";
+        if (mem_data.hasTwitter())
+            sns_text += `Twitter: [@${mem_data.getHandleTwitter()}](https://twitter.com/${mem_data.getURLTwitter()})`;
 
-                const embed = new EmbedBuilder()
-                                .setTitle(`${data.name}'s (${data.name_kanji}) Biography`)
-                                .setColor(color)
-                                .addFields(
-                                    { name: 'Nickname:', value: data.nickname },
-                                    { name: 'Birthdate:', value: data.birthdate },
-                                    { name: 'Birthplace:', value: data.birthplace },
-                                    { name: 'Height:', value: data.height },
-                                    { name: 'Bloodtype:', value: data.bloodtype },
-                                    { name: 'Group:', value: data.group },
-                                    { name: 'Team:', value: data.team }
-                                )
-                                .setImage(data.img_url)
+        if (mem_data.hasInstagram())
+        {
+            if (sns_text.length > 0)
+                sns_text += "\n";
 
-                con.release();    
-                interaction.reply({ embeds: [embed]});
-            })
-        })
+            sns_text += `Instagram: [@${mem_data.getHandleInstagram()}](https://www.instagram.com/${mem_data.getURLInstagram()})`;
+        }
+
+        if (sns_text.length > 0)
+            embed.addFields({ name: 'SNS', value: sns_text });
+
+        embed.addFields({ name: 'Official Profile Page', value: `[Group Site](${mem_data.getURLKoushiki()} 'This will take you to the member's official profile on the group's homepage.')` });
+
+        console.info("  Replying...");
+        interaction.editReply({ embeds: [embed]});
     }
 };
