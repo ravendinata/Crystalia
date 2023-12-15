@@ -5,6 +5,7 @@ const { Client, Collection, GatewayIntentBits, PermissionsBitField} = require('d
 const fs = require('fs');
 const os = require('os');
 
+const { Database } = require('./helpers/database.js');
 const logger = require('./helpers/logger.js');
 const ServerInfo = require('./helpers/sysHelper.js');
 const notifier = require('./helpers/mailer.js');
@@ -33,6 +34,9 @@ for (const file of commandFiles)
 			client.aliases.set(alias, command);
 	}
 }
+
+// LOAD DATABASE //
+Database.getInstance();
 
 /** ====================
  * * MAIN OPERATION * * 
