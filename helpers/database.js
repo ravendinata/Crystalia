@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+const sr = require('./showroomUtil.js');
 const { Error } = require('./constants.js');
 
 const BASE_URLS = require(`${process.env.data_path}/base_urls.json`);
@@ -71,6 +72,7 @@ class MemberDatabase
     // Handle getters
     getHandleTwitter() { return this.data.twitter_handle; }
     getHandleInstagram() { return this.data.insta_handle; }
+    getHandleTiktok() { return this.data.tiktok_handle; }
     
     getProfilePicture() 
     { 
@@ -92,10 +94,47 @@ class MemberDatabase
     getURLKoushiki() { return this.data.koushiki_url; }
     getURLTwitter() { return `https://twitter.com/${this.data.twitter_handle}`; }
     getURLInstagram() { return `https://www.instagram.com/${this.data.insta_handle}`; }
+    getURLTiktok() { return `https://www.tiktok.com/@${this.data.tiktok_handle}`; }
+    
+    async getURLShowroom() 
+    {
+        const key = await sr.roomIDtoURLKey(this.data.showroom_id);
+        return `https://www.showroom-live.com/r/${key}`;
+    }
 
     // Truthy functions
+    hasShowroom() { return this.data.showroom_id != null; }
     hasInstagram() { return this.data.insta_handle != null; }
     hasTwitter() { return this.data.twitter_handle != null; }
+    hasTiktok() { return this.data.tiktok_handle != null; }
+    hasAgency() { return this.data.agency != null; }
+
+    // Other builders
+    async getSNS()
+    {
+        let sns_text = "";
+
+        if (this.hasShowroom())
+        {
+            const room_name = await sr.getRoomName(this.data.showroom_id);
+            const url = await this.getURLShowroom();
+            sns_text += `Showroom: [${room_name}](${url})\n`;
+        }
+
+        if (this.hasTwitter())
+            sns_text += `Twitter: [@${this.getHandleTwitter()}](${this.getURLTwitter()})\n`;
+
+        if (this.hasInstagram())
+            sns_text += `Instagram: [@${this.getHandleInstagram()}](${this.getURLInstagram()})\n`;
+
+        if (this.hasTiktok())
+            sns_text += `TikTok: [@${this.getHandleTiktok()}](${this.getURLTiktok()})\n`;
+
+        if (sns_text.endsWith("\n"))
+            sns_text = sns_text.slice(0, -1);
+
+        return sns_text;
+    }
 }
 
 module.exports = 
