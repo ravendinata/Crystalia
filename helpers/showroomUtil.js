@@ -70,6 +70,11 @@ async function getRoomName(room_id)
     const result = await getAPI(`${BASE_API_URL}/room/profile?room_id=${room_id}`);
     return result.main_name;
 }
+async function roomIsOnlive(room_id)
+{
+    const result = await getAPI(`${BASE_API_URL}/room/profile?room_id=${room_id}`);
+    return result.is_onlive;
+}
 
 /* =======================
     EXPORTED FUNCTIONS
@@ -381,6 +386,7 @@ module.exports =
     roomIDtoURLKey,
     urlKeyToRoomID,
     getRoomName,
+    roomIsOnlive,
     getOnlive,
     getScheduledStream,
     getRoomInfo,
