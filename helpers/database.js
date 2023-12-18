@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const sr = require('./showroomUtil.js');
-const { Error } = require('./constants.js');
+const { Error, SNS_Icons_Emoji } = require('./constants.js');
 
 const BASE_URLS = require(`${process.env.data_path}/base_urls.json`);
 
@@ -137,17 +137,17 @@ class MemberDatabase
         {
             const room_name = await sr.getRoomName(this.data.showroom_id);
             const url = await this.getURLShowroom();
-            sns_text += `Showroom: [${room_name}](${url})\n`;
+            sns_text += `${SNS_Icons_Emoji.showroom}  [${room_name}](${url})\n`;
         }
 
         if (this.hasTwitter())
-            sns_text += `Twitter: [@${this.getHandleTwitter()}](${this.getURLTwitter()})\n`;
+            sns_text += `${SNS_Icons_Emoji.twitter} [@${this.getHandleTwitter()}](${this.getURLTwitter()})\n`;
 
         if (this.hasInstagram())
-            sns_text += `Instagram: [@${this.getHandleInstagram()}](${this.getURLInstagram()})\n`;
+            sns_text += `${SNS_Icons_Emoji.insta} [@${this.getHandleInstagram()}](${this.getURLInstagram()})\n`;
 
         if (this.hasTiktok())
-            sns_text += `TikTok: [@${this.getHandleTiktok()}](${this.getURLTiktok()})\n`;
+            sns_text += `${SNS_Icons_Emoji.tiktok} [@${this.getHandleTiktok()}](${this.getURLTiktok()})\n`;
 
         if (sns_text.endsWith("\n"))
             sns_text = sns_text.slice(0, -1);
