@@ -5,6 +5,7 @@ const { Error } = require('../helpers/constants.js');
 
 const GROUP_LOGO = require(`${process.env.data_path}/group_logo.json`);
 const BASE_URLS = require(`${process.env.data_path}/base_urls.json`);
+const LAST_UPDATE = require(`${process.env.data_path}/data_version.json`);
 
 console.info("Bio Module Initialized!");
 
@@ -78,7 +79,8 @@ module.exports =
                             { name: "Generation", value: mem_data.getGeneration(), inline: true },
                         )
                         .setImage(mem_data.getProfilePicture())
-                        .setThumbnail(mem_data.getThumbnail());
+                        .setThumbnail(mem_data.getThumbnail())
+                        .setFooter({ text: `Information Last Updated on ${LAST_UPDATE[group]}` });
         
         if (mem_data.hasTeam())
             embed.addFields({ name: 'Team', value: mem_data.getTeam(), inline: true });
