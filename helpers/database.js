@@ -138,7 +138,13 @@ class MemberDatabase
         {
             const room_name = await sr.getRoomName(this.data.showroom_id);
             const url = await this.getURLShowroom();
-            sns_text += `${SNS_Icons_Emoji.showroom}  [${room_name}](${url})\n`;
+            const onlive = await sr.roomIsOnlive(this.data.showroom_id);
+            
+            sns_text += `${SNS_Icons_Emoji.showroom}  [${room_name}](${url})`;
+            if (onlive)
+                sns_text += ` :satellite: [Streaming Now]\n`;
+            else
+                sns_text += `\n`;
         }
 
         if (this.hasTwitter())
