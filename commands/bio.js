@@ -91,6 +91,9 @@ module.exports =
 
         embed.addFields({ name: 'Official Profile Page', value: `[Group Site](${mem_data.getURLKoushiki()} 'This will take you to the member's official profile on the group's homepage.')` });
 
+        if (mem_data.hasKaishaProfile())
+            embed.addFields({ name: 'Agency Profile Page', value: `[Agency Site](${mem_data.getKaishaProfile()} 'This will take you to the member's official profile on the agency's homepage.')` });
+
         console.info("  Replying...");
         interaction.editReply({ embeds: [embed]});
     }
