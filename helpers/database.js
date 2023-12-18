@@ -17,10 +17,10 @@ class Database
         // Load member JSON data for each group
         this.akb48 = require(`${data_source}/member_data/akb48.json`);
         this.ske48 = require(`${data_source}/member_data/ske48.json`);
-        // this.nmb48 = require(`${data_source}/member_data/nmb48.json`);
-        // this.hkt48 = require(`${data_source}/member_data/hkt48.json`);
-        // this.ngt48 = require(`${data_source}/member_data/ngt48.json`);
-        // this.stu48 = require(`${data_source}/member_data/stu48.json`);
+        this.nmb48 = require(`${data_source}/member_data/nmb48.json`);
+        this.hkt48 = require(`${data_source}/member_data/hkt48.json`);
+        this.ngt48 = require(`${data_source}/member_data/ngt48.json`);
+        this.stu48 = require(`${data_source}/member_data/stu48.json`);
     }
 
     static getInstance()
