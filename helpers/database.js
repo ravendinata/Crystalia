@@ -85,11 +85,6 @@ class MemberDatabase
 
         return String(age);
     }
-
-    // Handle getters
-    getHandleTwitter() { return this.data.twitter_handle; }
-    getHandleInstagram() { return this.data.insta_handle; }
-    getHandleTiktok() { return this.data.tiktok_handle; }
     
     getProfilePicture() 
     { 
@@ -106,6 +101,21 @@ class MemberDatabase
         else
             return null
     }
+
+    // Truthy functions
+    isGraduated() { return this.data.graduated; }
+    hasTeam() { return this.data.team != null; }
+    hasShowroom() { return this.data.showroom_id != null; }
+    hasInstagram() { return this.data.insta_handle != null; }
+    hasTwitter() { return this.data.twitter_handle != null; }
+    hasTiktok() { return this.data.tiktok_handle != null; }
+    hasKaishaProfile() { return this.data.kaisha_profile != null; }
+
+    // Handle getters
+    getHandleTwitter() { return this.data.twitter_handle; }
+    getHandleInstagram() { return this.data.insta_handle; }
+    getHandleTiktok() { return this.data.tiktok_handle; }
+    getKaishaProfile() { return this.data.kaisha_profile; }
     
     // URL builders
     getURLKoushiki() { return BASE_URLS.koushiki_profile[this.group] + this.data.koushiki_profile_key; }
@@ -118,15 +128,6 @@ class MemberDatabase
         const key = await sr.roomIDtoURLKey(this.data.showroom_id);
         return `https://www.showroom-live.com/r/${key}`;
     }
-
-    // Truthy functions
-    isGraduated() { return this.data.graduated; }
-    hasTeam() { return this.data.team != null; }
-    hasShowroom() { return this.data.showroom_id != null; }
-    hasInstagram() { return this.data.insta_handle != null; }
-    hasTwitter() { return this.data.twitter_handle != null; }
-    hasTiktok() { return this.data.tiktok_handle != null; }
-    hasAgency() { return this.data.agency != null; }
 
     // Other builders
     async getSNS()
