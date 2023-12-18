@@ -65,6 +65,12 @@ async function urlKeyToRoomID(url_key)
     return await result.room_id;
 }
 
+async function getRoomName(room_id)
+{
+    const result = await getAPI(`${BASE_API_URL}/room/profile?room_id=${room_id}`);
+    return result.main_name;
+}
+
 /* =======================
     EXPORTED FUNCTIONS
 ======================= */
@@ -364,7 +370,6 @@ async function convert(interaction, param)
     return interaction.editReply({ embeds: [embed] });
 }
 
-
 /** ====================
  * * MODULE EXPORTS * * 
 ==================== **/
@@ -373,6 +378,9 @@ module.exports =
 {
     count,
     convert,
+    roomIDtoURLKey,
+    urlKeyToRoomID,
+    getRoomName,
     getOnlive,
     getScheduledStream,
     getRoomInfo,
