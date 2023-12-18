@@ -72,7 +72,7 @@ module.exports =
                             { name: 'Age', value: mem_data.getAge(), inline: true },
                             { name: 'Birthplace', value: mem_data.getBirthplace(), inline: true },
                             { name: 'Height', value: mem_data.getHeight(), inline: true },
-                            { name: 'Bloodtype', value: mem_data.getBloodtype(), inline: true },
+                            { name: 'Blood Type', value: mem_data.getBloodtype(), inline: true },
                             { name: '\u200B', value: '\u200B', inline: true},
                             { name: 'Agency', value: mem_data.getAgency(), inline: true },
                             { name: "Generation", value: mem_data.getGeneration(), inline: true },
