@@ -65,12 +65,11 @@ module.exports =
                         .setColor(color)
                         .setAuthor({ name: `${group.toUpperCase()}`, iconURL: GROUP_LOGO[group], url: BASE_URLS.group_homepage[group] })
                         .addFields(
-                            { name: 'Nickname', value: mem_data.getNickname() },
-                            { name: 'Name (Kanji)', value: mem_data.getKanji() },
                             { name: 'Birthdate', value: mem_data.getBirthdate(), inline: true },
                             { name: 'Birthplace', value: mem_data.getBirthplace(), inline: true },
                             { name: 'Height', value: mem_data.getHeight(), inline: true },
                             { name: 'Bloodtype', value: mem_data.getBloodtype(), inline: true },
+                            { name: '\u200B', value: '\u200B', inline: true},
                             { name: 'Agency', value: mem_data.getAgency(), inline: true },
                             { name: "Generation", value: mem_data.getGeneration(), inline: true },
                         )
