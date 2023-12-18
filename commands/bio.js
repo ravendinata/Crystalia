@@ -65,7 +65,11 @@ module.exports =
                         .setColor(color)
                         .setAuthor({ name: `${group.toUpperCase()}`, iconURL: GROUP_LOGO[group], url: BASE_URLS.group_homepage[group] })
                         .addFields(
+                            { name: 'Nickname', value: mem_data.getNickname(), inline: true },
+                            { name: 'Name (Kanji)', value: mem_data.getKanji(), inline: true},
+                            { name: '\u200B', value: '\u200B', inline: true},
                             { name: 'Birthdate', value: mem_data.getBirthdate(), inline: true },
+                            { name: 'Age', value: mem_data.getAge(), inline: true },
                             { name: 'Birthplace', value: mem_data.getBirthplace(), inline: true },
                             { name: 'Height', value: mem_data.getHeight(), inline: true },
                             { name: 'Bloodtype', value: mem_data.getBloodtype(), inline: true },
@@ -76,21 +80,12 @@ module.exports =
                         .setImage(mem_data.getProfilePicture())
                         .setThumbnail(mem_data.getThumbnail());
         
-        if (mem_data.getTeam() != null)
-            embed.addFields({ name: 'Team', value: mem_data.getTeam() });
+        if (mem_data.hasTeam())
+            embed.addFields({ name: 'Team', value: mem_data.getTeam(), inline: true });
+        else
+            embed.addFields({ name: '\u200B', value: '\u200B', inline: true });
 
-        let sns_text = "";
-        if (mem_data.hasTwitter())
-            sns_text += `Twitter: [@${mem_data.getHandleTwitter()}](https://twitter.com/${mem_data.getURLTwitter()})`;
-
-        if (mem_data.hasInstagram())
-        {
-            if (sns_text.length > 0)
-                sns_text += "\n";
-
-            sns_text += `Instagram: [@${mem_data.getHandleInstagram()}](https://www.instagram.com/${mem_data.getURLInstagram()})`;
-        }
-
+        let sns_text = await mem_data.getSNS();
         if (sns_text.length > 0)
             embed.addFields({ name: 'SNS', value: sns_text });
 
