@@ -45,7 +45,7 @@ class Database
             if (this[group][name] == null) {
                 return Error.MEM_NOT_FOUND;
             } else {
-                return new MemberDatabase(this[group][name]);
+                return new MemberDatabase(this[group][name], group);
             }
         } else return Error.GROUP_NOT_FOUND;
     }
@@ -53,9 +53,10 @@ class Database
 
 class MemberDatabase
 {
-    constructor(json_data)
+    constructor(json_data, group)
     {
         this.data = json_data;
+        this.group = group;
     }
 
     // Basic getters
@@ -107,7 +108,7 @@ class MemberDatabase
     }
     
     // URL builders
-    getURLKoushiki() { return this.data.koushiki_url; }
+    getURLKoushiki() { return BASE_URLS.koushiki_profile[this.group] + this.data.koushiki_profile_key; }
     getURLTwitter() { return `https://twitter.com/${this.data.twitter_handle}`; }
     getURLInstagram() { return `https://www.instagram.com/${this.data.insta_handle}`; }
     getURLTiktok() { return `https://www.tiktok.com/@${this.data.tiktok_handle}`; }
@@ -119,6 +120,8 @@ class MemberDatabase
     }
 
     // Truthy functions
+    isGraduated() { return this.data.graduated; }
+    hasTeam() { return this.data.team != null; }
     hasShowroom() { return this.data.showroom_id != null; }
     hasInstagram() { return this.data.insta_handle != null; }
     hasTwitter() { return this.data.twitter_handle != null; }
