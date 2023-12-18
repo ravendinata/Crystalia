@@ -69,6 +69,22 @@ class MemberDatabase
     getAgency() { return this.data.agency; }
     getGeneration() { return this.data.generation; }
 
+    // Advanced getters
+    getAge()
+    {
+        const today = new Date();
+        const birthdate = new Date(this.data.birthdate.replace(".", "-"));
+
+        let age = today.getFullYear() - birthdate.getFullYear();
+        const m = today.getMonth() - birthdate.getMonth();
+
+        if (m < 0 || (m === 0 && today.getDate() < birthdate.getDate())) {
+            age--;
+        }
+
+        return String(age);
+    }
+
     // Handle getters
     getHandleTwitter() { return this.data.twitter_handle; }
     getHandleInstagram() { return this.data.insta_handle; }
