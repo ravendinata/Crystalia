@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const sr = require('./showroomUtil.js');
+const { ActionRowBuilder, ButtonBuilder } = require('discord.js');
 const { Error, SNS_Icons_Emoji } = require('./constants.js');
 
 const BASE_URLS = require(`${process.env.data_path}/base_urls.json`);
@@ -160,6 +161,53 @@ class MemberDatabase
             sns_text = sns_text.slice(0, -1);
 
         return sns_text;
+    }
+
+    async getSNSButtons()
+    {
+        let row = new ActionRowBuilder();
+
+        if (this.hasShowroom())
+        {
+            row = row.addComponents(
+                new ButtonBuilder()
+                    .setStyle('Link')
+                    .setEmoji(SNS_Icons_Emoji.showroom)
+                    .setURL(await this.getURLShowroom())
+            );
+        }
+
+        if (this.hasTwitter())
+        {
+            row = row.addComponents(
+                new ButtonBuilder()
+                    .setStyle('Link')
+                    .setEmoji(SNS_Icons_Emoji.twitter)
+                    .setURL(this.getURLTwitter())
+            );
+        }
+
+        if (this.hasInstagram())
+        {
+            row = row.addComponents(
+                new ButtonBuilder()
+                    .setStyle('Link')
+                    .setEmoji(SNS_Icons_Emoji.insta)
+                    .setURL(this.getURLInstagram())
+            );
+        }
+
+        if (this.hasTiktok())
+        {
+            row = row.addComponents(
+                new ButtonBuilder()
+                    .setStyle('Link')
+                    .setEmoji(SNS_Icons_Emoji.tiktok)
+                    .setURL(this.getURLTiktok())
+            );
+        }
+
+        return row;
     }
 }
 
